@@ -104,11 +104,10 @@ service cloud.firestore {
 
     // Users & Subcollections
     match /users/{userId} {
-      allow get: if isOwner(userId);
+      allow get: if isSignedIn() && (isOwner(userId) || isAdmin());
+      allow list: if isAdmin();
       allow create: if isOwner(userId);
-      allow update: if isOwner(userId) && (
-        !incoming().keys().hasAny(['isAdmin']) || isProjectOwner()
-      );
+      allow update: if (isOwner(userId) && !incoming().diff(existing()).affectedKeys().hasAny(['isAdmin'])) || isAdmin();
 
       // Preferences
       match /preferences/main {

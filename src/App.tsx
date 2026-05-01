@@ -100,6 +100,7 @@ interface Article {
   isTrending?: boolean;
   status: 'pending' | 'approved' | 'rejected';
   sources?: { name: string; url: string }[];
+  readTime?: string;
 }
 
 interface UserPreference {
@@ -947,8 +948,9 @@ const ArticlePage = ({
   );
 };
 
-const AdminDashboard = ({ articles, isDarkMode, user, loadingData }: { articles: Article[], isDarkMode: boolean, user: FirebaseUser, loadingData: boolean }) => {
+const AdminDashboard = ({ articles, users, isDarkMode, user, loadingData }: { articles: Article[], users: any[], isDarkMode: boolean, user: FirebaseUser, loadingData: boolean }) => {
   const [showAdd, setShowAdd] = useState(false);
+  const [viewMode, setViewMode] = useState<'articles' | 'users'>('articles');
   const [editing, setEditing] = useState<Article | null>(null);
   
   const [title, setTitle] = useState('');
@@ -1084,6 +1086,18 @@ const AdminDashboard = ({ articles, isDarkMode, user, loadingData }: { articles:
     }
   };
 
+  const handleToggleUserAdmin = async (userId: string, currentStatus: boolean) => {
+    if (userId === user.uid) {
+      alert("Self-modification of administrative clearance is forbidden to prevent complete lockout.");
+      return;
+    }
+    try {
+      await updateDoc(doc(db, `users/${userId}`), { isAdmin: !currentStatus });
+    } catch (err) {
+      handleFirestoreError(err, OperationType.WRITE, `users/${userId}`);
+    }
+  };
+
   return (
     <div className="space-y-16">
       <header className="flex flex-col lg:flex-row justify-between items-start lg:items-end gap-12 border-b border-current opacity-10 pb-12">
@@ -1094,33 +1108,53 @@ const AdminDashboard = ({ articles, isDarkMode, user, loadingData }: { articles:
           </div>
           <h2 className="text-6xl md:text-8xl font-black italic tracking-tighter uppercase leading-[0.8]">Neural<br /><span className="text-primary italic">Control Center.</span></h2>
         </div>
-        <div className="flex gap-4">
-           <motion.button
-            whileHover={{ scale: 1.05 }}
-            whileTap={{ scale: 0.95 }}
-            onClick={() => { setEditing(null); setShowAdd(true); }}
-            className="px-10 py-5 rounded-2xl bg-primary text-white font-black uppercase tracking-widest text-[10px] glow-blue shadow-2xl flex items-center gap-3"
-          >
-            <PlusCircle size={18} /> Initialize New Signal
-          </motion.button>
-          <button
-            onClick={handleSimulatePulse}
-            className={`p-5 rounded-2xl border transition-all ${isDarkMode ? 'bg-white/5 border-white/10 opacity-40 hover:opacity-100' : 'bg-black/5 border-black/10 opacity-40 hover:opacity-100'}`}
-            title="Inject Mock Pulse"
-          >
-            <Activity size={20} />
-          </button>
-          <button
-             onClick={handleReset}
-             className="p-5 rounded-2xl bg-red-500/10 text-red-500 border border-red-500/20 opacity-40 hover:opacity-100 transition-all"
-             title="Dissolve All Signals"
-          >
-            <Zap size={20} />
-          </button>
+        <div className="flex flex-wrap gap-4">
+           <div className="flex p-1 rounded-2xl bg-current/[0.03] border border-current/10 mr-4">
+              <button 
+                onClick={() => setViewMode('articles')}
+                className={`px-6 py-3 rounded-xl text-[10px] font-black uppercase tracking-widest transition-all ${viewMode === 'articles' ? 'bg-primary text-white glow-blue' : 'opacity-40 hover:opacity-100'}`}
+              >
+                Signals
+              </button>
+              <button 
+                onClick={() => setViewMode('users')}
+                className={`px-6 py-3 rounded-xl text-[10px] font-black uppercase tracking-widest transition-all ${viewMode === 'users' ? 'bg-primary text-white glow-blue' : 'opacity-40 hover:opacity-100'}`}
+              >
+                Entities
+              </button>
+           </div>
+
+           {viewMode === 'articles' && (
+             <>
+               <motion.button
+                whileHover={{ scale: 1.05 }}
+                whileTap={{ scale: 0.95 }}
+                onClick={() => { setEditing(null); setShowAdd(true); }}
+                className="px-10 py-5 rounded-2xl bg-primary text-white font-black uppercase tracking-widest text-[10px] glow-blue shadow-2xl flex items-center gap-3"
+              >
+                <Plus size={18} /> Initialize New Signal
+              </motion.button>
+              <button 
+                onClick={handleSimulatePulse}
+                className={`p-5 rounded-2xl border transition-all ${isDarkMode ? 'bg-white/5 border-white/10 opacity-40 hover:opacity-100' : 'bg-black/5 border-black/10 opacity-40 hover:opacity-100'}`}
+                title="Inject Mock Pulse"
+              >
+                <Activity size={20} />
+              </button>
+              <button 
+                onClick={handleReset}
+                className="p-5 rounded-2xl bg-red-500/10 text-red-500 border border-red-500/20 opacity-40 hover:opacity-100 transition-all"
+                title="Purge Baseline"
+              >
+                <Zap size={20} />
+              </button>
+             </>
+           )}
         </div>
       </header>
 
-      <div className="grid gap-4">
+      {viewMode === 'articles' ? (
+        <div className="grid gap-4">
           {loadingData ? (
             Array(5).fill(0).map((_, i) => (
               <div key={i} className={`p-8 rounded-[2.5rem] border animate-pulse ${isDarkMode ? 'bg-white/5 border-white/5' : 'bg-black/5 border-black/5'}`}>
@@ -1216,7 +1250,64 @@ const AdminDashboard = ({ articles, isDarkMode, user, loadingData }: { articles:
               </div>
             </motion.div>
           ))}
-      </div>
+        </div>
+      ) : (
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+          {users.map(u => (
+            <motion.div 
+              key={u.id}
+              initial={{ scale: 0.9, opacity: 0 }}
+              animate={{ scale: 1, opacity: 1 }}
+              className={`p-8 rounded-[3rem] border transition-all duration-500 relative overflow-hidden group ${
+                isDarkMode ? 'bg-white/[0.02] border-white/5 hover:border-primary/30' : 'bg-white border-black/5 shadow-sm hover:shadow-xl'
+              }`}
+            >
+              <div className="flex gap-6 items-center relative z-10">
+                <div className="relative">
+                  {u.photoURL ? (
+                    <img src={u.photoURL} className="w-16 h-16 rounded-2xl object-cover" />
+                  ) : (
+                    <div className="w-16 h-16 rounded-2xl bg-primary/10 flex items-center justify-center">
+                      <User size={24} className="text-primary/40" />
+                    </div>
+                  )}
+                  {u.isAdmin && (
+                    <div className="absolute -top-2 -right-2 w-6 h-6 rounded-lg bg-primary text-white flex items-center justify-center glow-blue shadow-lg">
+                      <ShieldCheck size={12} />
+                    </div>
+                  )}
+                </div>
+                <div className="flex-1 min-w-0">
+                  <h3 className="text-lg font-black uppercase tracking-tighter truncate leading-none italic">{u.displayName}</h3>
+                  <p className="text-[10px] font-black uppercase tracking-[0.2em] truncate italic mt-1">{u.email}</p>
+                </div>
+              </div>
+              
+              <div className="mt-8 flex items-center justify-between gap-4 relative z-10">
+                <div className="flex flex-col">
+                   <span className="text-[8px] font-black uppercase tracking-widest opacity-40 italic">Neural Auth Level</span>
+                   <span className={`text-[10px] font-black uppercase tracking-widest italic ${u.isAdmin ? 'text-primary glow-blue' : 'opacity-60'}`}>
+                     {u.isAdmin ? 'Nexus Architect' : 'Standard Node'}
+                   </span>
+                </div>
+                
+                <button 
+                  onClick={() => handleToggleUserAdmin(u.id, u.isAdmin)}
+                  className={`px-4 py-2 rounded-xl text-[8px] font-black uppercase tracking-widest transition-all border ${
+                    u.isAdmin 
+                      ? 'bg-red-500/10 border-red-500/20 text-red-500 hover:bg-red-500 hover:text-white' 
+                      : 'bg-primary/10 border-primary/20 text-primary hover:bg-primary hover:text-white'
+                  }`}
+                >
+                  {u.isAdmin ? 'Revoke Protocol' : 'Elevate Identity'}
+                </button>
+              </div>
+              
+              <div className={`absolute top-0 right-0 w-32 h-32 blur-[60px] -mr-16 -mt-16 transition-opacity duration-700 ${u.isAdmin ? 'bg-primary/10 opacity-100' : 'bg-primary/5 opacity-0 group-hover:opacity-100'}`} />
+            </motion.div>
+          ))}
+        </div>
+      )}
 
       <Modal isOpen={showAdd} onClose={() => setShowAdd(false)} isDarkMode={isDarkMode} title={editing ? "Update Signal" : "Initialise Signal"}>
         <form onSubmit={handleSubmit} className="space-y-4">
@@ -1736,18 +1827,14 @@ export default function App() {
         // Ensure user profile exists
         const profRef = doc(db, `users/${currentUser.uid}`);
         const snap = await getDoc(profRef);
-        const isAdmin = currentUser.email === 'gawesh.bwela@gmail.com';
-        
         if (!snap.exists()) {
           await setDoc(profRef, {
             displayName: currentUser.displayName || currentUser.email?.split('@')[0],
             email: currentUser.email,
             photoURL: currentUser.photoURL || '',
-            isAdmin: isAdmin,
+            isAdmin: false, // Auto-assignment removed as requested. Set manually in console for first user.
             createdAt: serverTimestamp()
           });
-        } else if (isAdmin && !snap.data().isAdmin) {
-          await updateDoc(profRef, { isAdmin: true });
         }
       }
     });
@@ -1822,6 +1909,20 @@ export default function App() {
     return () => unsub();
   }, [user]);
 
+  // Aggregate all users for admin
+  const [allUsers, setAllUsers] = useState<any[]>([]);
+  useEffect(() => {
+    if (!profile?.isAdmin) {
+      setAllUsers([]);
+      return;
+    }
+    const q = query(collection(db, 'users'), limit(50));
+    const unsub = onSnapshot(q, (snap) => {
+      setAllUsers(snap.docs.map(doc => ({ id: doc.id, ...doc.data() })));
+    }, (err) => console.error("Neural scan failed:", err));
+    return () => unsub();
+  }, [profile]);
+
   // Helper functions
   const handleProgressUpdate = async (line: number, total: number) => {
     if (!user || !selectedArticle) return;
@@ -1856,11 +1957,6 @@ export default function App() {
     } catch (err) {
       handleFirestoreError(err, OperationType.WRITE, path);
     }
-  };
-
-  const promoteAdmin = async () => {
-    if (!user) return;
-    await updateDoc(doc(db, `users/${user.uid}`), { isAdmin: true });
   };
 
   const handleUpdateProfile = async (e: React.FormEvent) => {
@@ -2172,9 +2268,6 @@ export default function App() {
               <button onClick={() => setIsEditingProfile(true)} className="flex-1 py-5 rounded-2xl border border-primary/20 text-primary font-black text-[10px] uppercase tracking-[0.2em] hover:bg-primary/5 transition-all italic">Adjust Identity</button>
               <button onClick={() => signOut(auth).then(() => setActiveView('home'))} className="flex-1 py-5 rounded-2xl border border-red-500/20 text-red-500 font-black text-[10px] uppercase tracking-[0.2em] hover:bg-red-500/5 transition-all italic">Disconnect Session</button>
             </div>
-            {profile && !profile.isAdmin && (
-              <button onClick={promoteAdmin} className="mt-8 text-[8px] opacity-10 hover:opacity-100 transition-opacity uppercase font-black tracking-[0.4em] italic underline underline-offset-4 decoration-primary/20">Elevate to Architect Credentials</button>
-            )}
           </div>
         )}
       </div>
@@ -2365,7 +2458,7 @@ export default function App() {
             )}
             {activeView === 'admin' && (
               profile?.isAdmin ? (
-                <AdminDashboard articles={articles} isDarkMode={isDarkMode} user={user!} loadingData={loadingData} />
+                <AdminDashboard articles={articles} users={allUsers} isDarkMode={isDarkMode} user={user!} loadingData={loadingData} />
               ) : (
                 <div className="text-center py-40 space-y-8">
                   <div className="w-24 h-24 rounded-full bg-red-500/10 flex items-center justify-center text-red-500 mx-auto">
