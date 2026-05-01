@@ -488,8 +488,11 @@ const Footer = ({ onNavigate, isDarkMode }: { onNavigate: (v: any) => void, isDa
            <div className="w-2 h-2 rounded-full bg-green-500 animate-pulse shadow-[0_0_8px_rgba(34,197,94,1)]" />
            <p className="text-[10px] font-black uppercase tracking-[0.3em] opacity-80">All systems operational // Signal index: 99.9%</p>
         </div>
-        <div className="flex items-center gap-12">
-          <p className="text-[10px] font-bold uppercase tracking-[0.3em] opacity-40">© 2026 BrieflyX. All rights reserved.</p>
+        <div className="flex flex-col md:flex-row items-center gap-4 md:gap-12">
+          <div className="text-center md:text-right">
+            <p className="text-[10px] font-bold uppercase tracking-[0.2em] opacity-60">BrieflyX © 2026</p>
+            <p className="text-[9px] font-medium opacity-40">Smart, fast, and personalized news for the modern reader.</p>
+          </div>
           <p className="text-[10px] font-black uppercase tracking-[0.3em] text-primary glow-blue">Uplink V5.4.0</p>
         </div>
       </div>
@@ -1807,6 +1810,42 @@ export default function App() {
     return () => unsubscribe();
   }, []);
 
+  // Update document title and meta tags based on current view
+  useEffect(() => {
+    let title = 'BrieflyX | Discover Smart News Faster';
+    let description = 'Explore trending news with short summaries and unlock full articles for a deeper reading experience. Stay informed the smarter way with BrieflyX.';
+
+    if (activeView === 'home') {
+      title = 'BrieflyX | Discover Smart News Faster';
+      description = 'Explore trending news with short summaries and unlock full articles for a deeper reading experience. Stay informed the smarter way with BrieflyX.';
+    } else if (activeView === 'feed') {
+      title = 'News Feed – BrieflyX';
+      description = 'Stay updated with the latest news across technology, gaming, science, and world news with personalized content.';
+    } else if (activeView === 'article' && selectedArticle) {
+      title = `${selectedArticle.title} – BrieflyX`;
+      description = selectedArticle.summary;
+    } else if (activeView === 'profile') {
+      title = 'My Profile – BrieflyX';
+      description = 'Manage your account, update your profile, and customize your news preferences for a better experience.';
+    } else if (activeView === 'admin') {
+      title = 'Admin Dashboard – BrieflyX';
+      description = 'Create, edit, and manage news articles efficiently with a clean and powerful admin interface.';
+    } else if (activeView === 'about') {
+      title = 'About BrieflyX';
+      description = 'Learn about BrieflyX, the futuristic news platform delivering concise, high-quality updates for the modern reader.';
+    } else if (activeView === 'contact') {
+      title = 'Contact Us – BrieflyX';
+      description = 'Get in touch with the BrieflyX team. We\'d love to hear from you.';
+    }
+
+    document.title = title;
+    const metaDescription = document.querySelector('meta[name="description"]');
+    if (metaDescription) {
+      metaDescription.setAttribute('content', description);
+    }
+  }, [activeView, selectedArticle]);
+
+
   // Listen to Articles
   useEffect(() => {
     const q = query(collection(db, 'articles'), limit(100));
@@ -1968,7 +2007,7 @@ export default function App() {
                 className="flex items-center gap-3"
               >
                 <div className="h-[2px] w-8 bg-primary" />
-                <span className={`text-[10px] font-bold uppercase tracking-[0.4em] ${isDarkMode ? 'text-primary' : 'text-slate-900'}`}>The Future of News // v1.0</span>
+                <span className={`text-[10px] font-bold uppercase tracking-[0.4em] ${isDarkMode ? 'text-primary' : 'text-slate-900'}`}>Smart News Made Simple // v1.0</span>
               </motion.div>
               
               <div className="space-y-4">
@@ -1978,7 +2017,7 @@ export default function App() {
                   transition={{ duration: 0.8, ease: [0.22, 1, 0.36, 1] }}
                   className={`text-6xl lg:text-8xl font-black tracking-tight leading-[1] ${isDarkMode ? 'text-white' : 'text-slate-950'}`}
                 >
-                  Minimal. <br /><span className="text-transparent bg-clip-text bg-gradient-to-r from-primary to-accent">Futuristic. News.</span>
+                  Stay Updated<br/>in Seconds
                 </motion.h1>
               </div>
 
