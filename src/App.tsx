@@ -549,18 +549,23 @@ const SkeletonTrendingCard = ({ isDarkMode }: any) => (
 );
 
 const DetailCard = ({ icon, title, desc, isDarkMode }: any) => (
-    <div className={`p-8 rounded-2xl border transition-all duration-300 hover:shadow-lg group ${isDarkMode ? 'bg-card-dark border-white/5 hover:border-primary/30' : 'bg-card-light border-black/5 hover:bg-white'}`}>
-    <div className="w-12 h-12 rounded-xl bg-primary/10 text-primary flex items-center justify-center mb-6 group-hover:scale-110 transition-transform">
-      {icon}
-    </div>
-    <h3 className="text-lg font-bold tracking-tight mb-2">{title}</h3>
-    <p className="text-sm opacity-60 leading-relaxed font-medium">{desc}</p>
-  </div>
+    <motion.div
+      initial={{ opacity: 0, y: 20 }}
+      animate={{ opacity: 1, y: 0 }}
+      whileHover={{ y: -8, scale: 1.02 }}
+      className={`p-10 rounded-3xl border transition-all duration-300 hover:shadow-2xl group backdrop-blur-sm ${isDarkMode ? 'bg-card-dark/80 border-white/10 hover:border-primary/40 hover:bg-card-dark' : 'bg-white/40 border-white/30 hover:bg-white/60 hover:border-primary/30'}`}
+    >
+      <div className={`w-14 h-14 rounded-2xl flex items-center justify-center mb-8 group-hover:scale-125 transition-all duration-300 ${isDarkMode ? 'bg-gradient-to-br from-primary/30 to-accent/20 text-primary' : 'bg-gradient-to-br from-primary/20 to-accent/10 text-primary'}`}>
+        {icon}
+      </div>
+      <h3 className={`text-xl font-bold tracking-tight mb-3 ${isDarkMode ? 'text-white' : 'text-slate-900'}`}>{title}</h3>
+      <p className={`text-sm leading-relaxed font-medium ${isDarkMode ? 'text-white/70' : 'text-slate-700'}`}>{desc}</p>
+    </motion.div>
 );
 
-const ArticleCard = ({ 
-  article, 
-  isDarkMode, 
+const ArticleCard = ({
+  article,
+  isDarkMode,
   onClick,
   progress
 }: any) => {
@@ -573,69 +578,69 @@ const ArticleCard = ({
       layout
       initial={{ opacity: 0, y: 20 }}
       animate={{ opacity: 1, y: 0 }}
-      whileHover={{ y: -12, scale: 1.02, boxShadow: isDarkMode ? '0 0 50px -10px rgba(59,130,246,0.3)' : '0 20px 40px -10px rgba(0,0,0,0.1)' }}
+      whileHover={{ y: -12, scale: 1.02, boxShadow: isDarkMode ? '0 0 60px -10px rgba(59,130,246,0.4)' : '0 25px 50px -12px rgba(0,0,0,0.15)' }}
       whileTap={{ scale: 0.98 }}
       onClick={() => onClick(article)}
-      className={`group relative overflow-hidden rounded-2xl cursor-pointer transition-all duration-300 border ${
-        isDarkMode 
-          ? 'bg-card-dark border-white/5 hover:border-primary/50 backdrop-blur-md' 
-          : 'bg-card-light border-black/5 hover:border-primary/30'
+      className={`group relative overflow-hidden rounded-3xl cursor-pointer transition-all duration-300 border ${
+        isDarkMode
+          ? 'bg-card-dark border-white/10 hover:border-primary/40 shadow-lg hover:shadow-2xl backdrop-blur-md'
+          : 'bg-card-light border-black/10 hover:border-primary/30 shadow-md hover:shadow-xl'
       }`}
     >
-      <div className="aspect-[1.5] overflow-hidden relative">
-        <motion.img 
+      <div className="aspect-[1.6] overflow-hidden relative">
+        <motion.img
           initial={{ opacity: 0 }}
           animate={{ opacity: imageLoaded ? 1 : 0 }}
           transition={{ duration: 0.8, ease: "easeOut" }}
-          src={article.imageUrl} 
-          alt={article.title} 
+          src={article.imageUrl}
+          alt={article.title}
           onLoad={() => setImageLoaded(true)}
-          className="w-full h-full object-cover transition-transform duration-[1s] group-hover:scale-105"
+          className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-110"
           referrerPolicy="no-referrer"
         />
         {!imageLoaded && (
           <div className={`absolute inset-0 animate-pulse ${isDarkMode ? 'bg-white/5' : 'bg-black/5'}`} />
         )}
-        <div className="absolute inset-0 bg-gradient-to-t from-slate-950/80 via-transparent to-transparent group-hover:opacity-60 transition-opacity" />
-        
-        <div className="absolute top-4 left-4">
-          <span className="px-3 py-1 rounded-lg bg-primary/90 text-white text-[9px] font-bold uppercase tracking-widest shadow-lg">
+        <div className="absolute inset-0 bg-gradient-to-t from-slate-950/90 via-slate-950/20 to-transparent group-hover:opacity-70 transition-opacity duration-300" />
+
+        <div className="absolute top-5 left-5">
+          <span className="px-4 py-2 rounded-lg bg-primary/95 text-white text-[10px] font-bold uppercase tracking-widest shadow-xl backdrop-blur-sm">
             {article.category}
           </span>
         </div>
       </div>
-      
-      <div className="p-6 space-y-3">
-        <h3 className={`text-xl font-bold leading-tight tracking-tight group-hover:text-primary transition-colors ${isDarkMode ? 'text-white' : 'text-slate-900'}`}>
+
+      <div className="p-8 space-y-4">
+        <h3 className={`text-lg font-bold leading-snug tracking-tight group-hover:text-primary transition-colors duration-300 line-clamp-2 ${isDarkMode ? 'text-white' : 'text-slate-900'}`}>
           {article.title}
         </h3>
-        <p className={`text-sm line-clamp-2 leading-relaxed opacity-60 font-medium ${isDarkMode ? 'text-white' : 'text-slate-900'}`}>
+        <p className={`text-sm leading-relaxed opacity-70 font-medium line-clamp-2 ${isDarkMode ? 'text-white/70' : 'text-slate-700'}`}>
           {article.summary}
         </p>
       </div>
-        
-        <div className={`pt-6 border-t border-current/5 flex items-center justify-between`}>
-          <div className="flex items-center gap-3">
-            <div className="w-8 h-8 rounded-xl bg-primary/10 text-primary flex items-center justify-center border border-primary/20">
-              <span className="text-[8px] font-black italic">ID</span>
-            </div>
-            <div className="flex flex-col">
-              <span className="text-[10px] font-black uppercase tracking-widest opacity-80 group-hover:text-primary transition-colors">{article.author}</span>
-              <span className="text-[8px] font-bold opacity-80 uppercase tracking-[0.2em]">BrieflyX Editor</span>
-            </div>
+
+      <div className={`px-8 pb-8 border-t ${isDarkMode ? 'border-white/10' : 'border-black/10'} flex items-center justify-between`}>
+        <div className="flex items-center gap-3">
+          <div className={`w-9 h-9 rounded-xl flex items-center justify-center border font-black italic text-[9px] transition-all ${isDarkMode ? 'bg-primary/15 text-primary border-primary/30' : 'bg-primary/10 text-primary border-primary/20'}`}>
+            ID
           </div>
-          <div className="flex -space-x-1.5">
-             {[1,2,3].map(i => (
-               <div key={i} className="w-7 h-7 rounded-lg border-2 border-slate-950 bg-slate-800 overflow-hidden shadow-2xl">
-                 <img src={`https://api.dicebear.com/7.x/avataaars/svg?seed=agent${i}${article.id}`} className="w-full h-full object-cover" />
-               </div>
-             ))}
+          <div className="flex flex-col">
+            <span className={`text-[11px] font-bold uppercase tracking-widest transition-colors group-hover:text-primary ${isDarkMode ? 'text-white/90' : 'text-slate-900'}`}>{article.author}</span>
+            <span className="text-[9px] font-medium opacity-60 uppercase tracking-[0.2em]">BrieflyX Editor</span>
           </div>
         </div>
-      
+        <div className="flex -space-x-2">
+          {[1,2,3].map(i => (
+            <div key={i} className={`w-8 h-8 rounded-lg border-2 overflow-hidden shadow-lg transition-transform hover:scale-110 ${isDarkMode ? 'border-slate-950' : 'border-white'}`}>
+              <img src={`https://api.dicebear.com/7.x/avataaars/svg?seed=agent${i}${article.id}`} className="w-full h-full object-cover" alt="contributor" />
+            </div>
+          ))}
+        </div>
+      </div>
+
       {/* Decorative Corner */}
-      <div className="absolute top-0 right-0 w-24 h-24 pointer-events-none overflow-hidden opacity-10">
-        <div className="absolute top-0 right-0 w-16 h-[1px] bg-primary rotate-45 transform translate-x-4 -translate-y-4" />
+      <div className="absolute top-0 right-0 w-32 h-32 pointer-events-none overflow-hidden opacity-5">
+        <div className="absolute top-0 right-0 w-20 h-[2px] bg-primary rotate-45 transform translate-x-6 -translate-y-6" />
       </div>
     </motion.div>
   );
@@ -1997,139 +2002,145 @@ export default function App() {
     const latest = approvedArticles.filter(a => !a.isTrending).slice(0, 6);
 
     return (
-      <div className="space-y-40">
-        <section className="min-h-[70vh] flex flex-col justify-center relative">
-          <div className="relative z-10 space-y-12 max-w-4xl">
-            <div className="space-y-6">
-              <motion.div 
+      <div className="space-y-48">
+        <section className="min-h-[75vh] flex flex-col justify-center relative pt-8">
+          <div className="relative z-10 space-y-16 max-w-4xl">
+            <div className="space-y-8">
+              <motion.div
                 initial={{ opacity: 0, x: -20 }}
                 animate={{ opacity: 1, x: 0 }}
                 className="flex items-center gap-3"
               >
-                <div className="h-[2px] w-8 bg-primary" />
-                <span className={`text-[10px] font-bold uppercase tracking-[0.4em] ${isDarkMode ? 'text-primary' : 'text-slate-900'}`}>Smart News Made Simple // v1.0</span>
+                <div className="h-1 w-10 bg-gradient-to-r from-primary to-accent" />
+                <span className={`text-[10px] font-bold uppercase tracking-[0.5em] ${isDarkMode ? 'text-primary' : 'text-slate-900'}`}>Smart News Made Simple // v1.0</span>
               </motion.div>
-              
-              <div className="space-y-4">
-                <motion.h1 
+
+              <div className="space-y-6">
+                <motion.h1
                   initial={{ opacity: 0, y: 40 }}
                   animate={{ opacity: 1, y: 0 }}
                   transition={{ duration: 0.8, ease: [0.22, 1, 0.36, 1] }}
-                  className={`text-6xl lg:text-8xl font-black tracking-tight leading-[1] ${isDarkMode ? 'text-white' : 'text-slate-950'}`}
+                  className={`text-7xl lg:text-8xl xl:text-9xl font-black tracking-tighter leading-[0.95] ${isDarkMode ? 'text-white' : 'text-slate-950'}`}
                 >
                   Stay Updated<br/>in Seconds
                 </motion.h1>
               </div>
 
-              <motion.p 
+              <motion.p
                 initial={{ opacity: 0 }}
-                animate={{ opacity: 0.6 }}
+                animate={{ opacity: 0.7 }}
                 transition={{ delay: 0.5 }}
-                className={`text-xl font-medium leading-relaxed max-w-2xl ${isDarkMode ? 'text-white' : 'text-slate-900'}`}
+                className={`text-lg lg:text-xl font-medium leading-relaxed max-w-2xl ${isDarkMode ? 'text-white/80' : 'text-slate-700'}`}
               >
                 Stay ahead with BrieflyX. We synthesize complex global updates into clean, essential insights for the next generation of thinkers.
               </motion.p>
             </div>
 
-            <motion.div 
+            <motion.div
               initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ delay: 0.7 }}
-              className="flex flex-wrap gap-4"
+              className="flex flex-col sm:flex-row gap-6 pt-8"
             >
-              <button 
+              <button
                 onClick={() => setActiveView('feed')}
-                className="px-10 py-5 rounded-2xl bg-gradient-to-r from-primary to-accent text-white font-bold uppercase tracking-widest text-[11px] hover:scale-[1.05] active:scale-95 transition-all flex items-center gap-3 shadow-xl"
+                className="px-12 py-6 rounded-2xl bg-gradient-to-r from-primary to-accent text-white font-bold uppercase tracking-widest text-[12px] hover:shadow-2xl hover:scale-[1.03] active:scale-95 transition-all duration-300 flex items-center justify-center gap-3 shadow-lg"
               >
                 View Feed
-                <ArrowRight size={18} />
+                <ArrowRight size={20} />
               </button>
-              <button 
+              <button
                 onClick={() => setActiveView('about')}
-                className={`px-10 py-5 rounded-2xl border border-current font-bold uppercase tracking-widest text-[11px] transition-all ${isDarkMode ? 'text-white border-white/20 hover:bg-white/5' : 'text-slate-900 border-slate-200 hover:bg-slate-50'}`}
+                className={`px-12 py-6 rounded-2xl border-2 font-bold uppercase tracking-widest text-[12px] transition-all duration-300 hover:scale-[1.02] active:scale-95 ${isDarkMode ? 'text-white border-white/30 hover:bg-white/10 hover:border-white/50' : 'text-slate-900 border-slate-300 hover:bg-slate-100 hover:border-slate-400'}`}
               >
                 Our Story
               </button>
             </motion.div>
           </div>
         </section>
-        
-        <section className="grid grid-cols-1 md:grid-cols-3 gap-8">
-          <DetailCard 
-            icon={<Cpu size={24} />} 
-            title="Smart Synthesis" 
+
+        <section className="grid grid-cols-1 md:grid-cols-3 gap-10">
+          <DetailCard
+            icon={<Cpu size={24} />}
+            title="Smart Synthesis"
             desc="AI-driven analysis that finds the core of every story instantly."
             isDarkMode={isDarkMode}
           />
-          <DetailCard 
-            icon={<ShieldCheck size={24} />} 
-            title="Verified Truth" 
+          <DetailCard
+            icon={<ShieldCheck size={24} />}
+            title="Verified Truth"
             desc="Exhaustive cross-referencing protocols to eliminate misinformation."
             isDarkMode={isDarkMode}
           />
-          <DetailCard 
-            icon={<Globe size={24} />} 
-            title="Global Reach" 
+          <DetailCard
+            icon={<Globe size={24} />}
+            title="Global Reach"
             desc="Connecting signals from across the planet on a single unified grid."
             isDarkMode={isDarkMode}
           />
         </section>
 
-        <section className="space-y-16">
-          <div className="flex flex-col md:flex-row md:items-end justify-between gap-8 border-b border-current/10 pb-10">
-            <div className="space-y-2">
-              <h2 className="text-4xl font-bold tracking-tight">Top Stories</h2>
-              <p className={`text-[10px] font-bold uppercase tracking-[0.4em] ${isDarkMode ? 'text-white/40' : 'text-slate-400'}`}>Currently trending across the network</p>
+        <section className="space-y-24">
+          <div className="flex flex-col md:flex-row md:items-end justify-between gap-8 border-b-2 border-current/10 pb-12">
+            <div className="space-y-3">
+              <h2 className={`text-5xl font-bold tracking-tight ${isDarkMode ? 'text-white' : 'text-slate-950'}`}>Top Stories</h2>
+              <p className={`text-[11px] font-bold uppercase tracking-[0.4em] ${isDarkMode ? 'text-white/50' : 'text-slate-500'}`}>Currently trending across the network</p>
             </div>
-            <div className="flex gap-2">
-              <span className="px-3 py-1 rounded-full bg-primary/10 border border-primary/20 text-primary text-[8px] font-bold uppercase tracking-widest animate-pulse">Live Updates</span>
+            <div className="flex gap-3">
+              <span className="px-4 py-2 rounded-full bg-gradient-to-r from-primary/20 to-accent/20 border border-primary/30 text-primary text-[10px] font-bold uppercase tracking-widest animate-pulse backdrop-blur-sm">Live Updates</span>
             </div>
           </div>
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8">
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-10">
             {loadingData ? (
               Array(4).fill(0).map((_, i) => <SkeletonTrendingCard key={i} isDarkMode={isDarkMode} />)
             ) : trending.length > 0 ? (
               trending.map(art => (
-                <motion.div 
+                <motion.div
                   key={art.id}
-                  whileHover={{ y: -8 }}
+                  layout
+                  initial={{ opacity: 0, y: 20 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  whileHover={{ y: -10, scale: 1.02 }}
+                  whileTap={{ scale: 0.98 }}
                   onClick={() => { setSelectedArticle(art); setActiveView('article'); }}
-                  className={`p-8 rounded-2xl border cursor-pointer transition-all duration-300 group relative overflow-hidden flex flex-col justify-between aspect-square ${
-                    isDarkMode ? 'bg-card-dark border-white/5 hover:border-primary/40' : 'bg-card-light border-black/5 hover:border-primary/20 shadow-xl'
+                  className={`p-10 rounded-3xl border cursor-pointer transition-all duration-300 group relative overflow-hidden flex flex-col justify-between aspect-square shadow-lg hover:shadow-2xl ${
+                    isDarkMode ? 'bg-card-dark border-white/10 hover:border-primary/40 hover:bg-card-dark/95' : 'bg-card-light border-black/5 hover:border-primary/20 shadow-xl'
                   }`}
                 >
                   <div className="relative z-10">
-                    <span className="text-[9px] font-bold uppercase tracking-widest px-2 py-1 rounded-lg bg-primary/10 text-primary border border-primary/20 mb-6 inline-block">
+                    <span className="text-[10px] font-bold uppercase tracking-widest px-3 py-1.5 rounded-lg bg-gradient-to-r from-primary/20 to-accent/10 text-primary border border-primary/30 mb-8 inline-block backdrop-blur-sm">
                       {art.category}
                     </span>
-                    <h3 className={`text-xl font-bold leading-tight tracking-tight mb-4 group-hover:text-primary transition-colors line-clamp-3 ${isDarkMode ? 'text-white' : 'text-slate-950'}`}>
+                    <h3 className={`text-lg font-bold leading-tight tracking-tight mb-6 group-hover:text-primary transition-colors line-clamp-3 ${isDarkMode ? 'text-white' : 'text-slate-950'}`}>
                       {art.title}
                     </h3>
                   </div>
-                  <div className="relative z-10 pt-6 border-t border-current/5 flex items-center justify-between">
-                    <span className="text-[10px] font-bold uppercase tracking-widest opacity-40">{art.author}</span>
-                    <ArrowUpRight size={16} className={`transition-all ${isDarkMode ? 'text-white' : 'text-slate-400'} group-hover:text-primary group-hover:translate-x-1 group-hover:-translate-y-1`} />
+                  <div className="relative z-10 pt-8 border-t border-current/10 flex items-center justify-between">
+                    <span className="text-[11px] font-bold uppercase tracking-widest opacity-60">{art.author}</span>
+                    <motion.div whileHover={{ x: 4, y: -4 }}>
+                      <ArrowUpRight size={18} className={`transition-colors ${isDarkMode ? 'text-white/60 group-hover:text-primary' : 'text-slate-400 group-hover:text-primary'}`} />
+                    </motion.div>
                   </div>
                 </motion.div>
               ))
             ) : (
-              <div className="col-span-full py-12 text-center opacity-40 text-[10px] font-bold uppercase tracking-widest">Searching for signals...</div>
+              <div className="col-span-full py-16 text-center opacity-40 text-[11px] font-bold uppercase tracking-widest">Searching for signals...</div>
             )}
           </div>
         </section>
 
-        <section className="space-y-16">
-          <div className="flex flex-col md:flex-row md:items-end justify-between gap-8 border-b border-current/10 pb-10">
-            <div className="space-y-2">
-              <h2 className="text-4xl font-bold tracking-tight">Latest News</h2>
-              <p className={`text-[10px] font-bold uppercase tracking-[0.4em] ${isDarkMode ? 'text-white/40' : 'text-slate-400'}`}>The freshest insights from around the globe</p>
+        <section className="space-y-24">
+          <div className="flex flex-col md:flex-row md:items-end justify-between gap-8 border-b-2 border-current/10 pb-12">
+            <div className="space-y-3">
+              <h2 className={`text-5xl font-bold tracking-tight ${isDarkMode ? 'text-white' : 'text-slate-950'}`}>Latest News</h2>
+              <p className={`text-[11px] font-bold uppercase tracking-[0.4em] ${isDarkMode ? 'text-white/50' : 'text-slate-500'}`}>The freshest insights from around the globe</p>
             </div>
-            <button onClick={() => setActiveView('feed')} className={`px-10 py-4 rounded-2xl border font-bold uppercase tracking-widest text-[10px] transition-all group flex items-center gap-4 ${isDarkMode ? 'bg-white/5 border-white/10 hover:bg-white/10' : 'bg-slate-100 border-slate-200 hover:bg-slate-200'}`}>
+            <button onClick={() => setActiveView('feed')} className={`px-12 py-4 rounded-2xl border-2 font-bold uppercase tracking-widest text-[11px] transition-all duration-300 group flex items-center gap-4 ${isDarkMode ? 'bg-white/5 border-white/20 hover:bg-white/10 hover:border-primary/50' : 'bg-slate-100 border-slate-300 hover:bg-slate-200 hover:border-primary/40'}`}>
               Explore More
-              <ArrowRight size={16} className="group-hover:translate-x-1 transition-transform" />
+              <ArrowRight size={18} className="group-hover:translate-x-1 transition-transform" />
             </button>
           </div>
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-x-8 gap-y-16">
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-x-10 gap-y-20">
             {loadingData ? (
               Array(6).fill(0).map((_, i) => <SkeletonCard key={i} isDarkMode={isDarkMode} />)
             ) : (
