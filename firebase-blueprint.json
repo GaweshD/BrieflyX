@@ -1,0 +1,83 @@
+{
+  "entities": {
+    "User": {
+      "title": "User",
+      "description": "User profile document",
+      "type": "object",
+      "properties": {
+        "displayName": { "type": "string" },
+        "email": { "type": "string" },
+        "photoURL": { "type": "string" },
+        "isAdmin": { "type": "boolean" },
+        "createdAt": { "type": "string", "format": "date-time" }
+      }
+    },
+    "Article": {
+      "title": "Article",
+      "description": "News article document",
+      "type": "object",
+      "properties": {
+        "title": { "type": "string" },
+        "summary": { "type": "string" },
+        "content": { "type": "string", "description": "Full text, will be split by lines" },
+        "category": { "type": "string" },
+        "imageUrl": { "type": "string" },
+        "author": { "type": "string" },
+        "isTrending": { "type": "boolean" },
+        "status": { "type": "string", "enum": ["pending", "approved", "rejected"] },
+        "createdAt": { "type": "string", "format": "date-time" }
+      }
+    },
+    "Preference": {
+      "title": "Preference",
+      "description": "User category preferences",
+      "type": "object",
+      "properties": {
+        "categories": { "type": "array", "items": { "type": "string" } },
+        "updatedAt": { "type": "string", "format": "date-time" }
+      }
+    },
+    "ReadingProgress": {
+      "title": "ReadingProgress",
+      "description": "Tracks user reading position per article",
+      "type": "object",
+      "properties": {
+        "articleId": { "type": "string" },
+        "lastLineRead": { "type": "number" },
+        "isCompleted": { "type": "boolean" },
+        "updatedAt": { "type": "string", "format": "date-time" }
+      }
+    },
+    "DailyStats": {
+      "title": "DailyStats",
+      "description": "Tracks daily user limits items",
+      "type": "object",
+      "properties": {
+        "chatCount": { "type": "number" },
+        "updatedAt": { "type": "string", "format": "date-time" }
+      }
+    },
+    "Comment": {
+      "title": "Comment",
+      "description": "User comments on articles",
+      "type": "object",
+      "properties": {
+        "articleId": { "type": "string" },
+        "userId": { "type": "string" },
+        "userName": { "type": "string" },
+        "userPhoto": { "type": "string" },
+        "text": { "type": "string" },
+        "createdAt": { "type": "string", "format": "date-time" }
+      },
+      "required": ["articleId", "userId", "text", "createdAt"]
+    }
+  },
+  "firestore": {
+    "users/{uid}": { "schema": "User", "description": "User profiles" },
+    "articles/{articleId}": { "schema": "Article", "description": "Global news articles" },
+    "comments/{commentId}": { "schema": "Comment", "description": "Global user comments" },
+    "users/{uid}/preferences/main": { "schema": "Preference", "description": "User category preferences" },
+    "users/{uid}/readingProgress/{progressId}": { "schema": "ReadingProgress", "description": "User reading history" },
+    "users/{uid}/dailyStats/{date}": { "schema": "DailyStats", "description": "Daily usage limits" }
+  }
+}

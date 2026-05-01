@@ -1,0 +1,130 @@
+rules_version = '2';
+service cloud.firestore {
+  match /databases/{database}/documents {
+    // 0. Global Safety Net
+    match /{document=**} {
+      allow read, write: if false;
+    }
+
+    // --- Global Helpers ---
+    function isSignedIn() {
+      return request.auth != null;
+    }
+
+    function isOwner(userId) {
+      return isSignedIn() && request.auth.uid == userId;
+    }
+
+    function isAdmin() {
+      return isSignedIn() && get(/databases/$(database)/documents/users/$(request.auth.uid)).data.get('isAdmin', false) == true;
+    }
+
+    function isProjectOwner() {
+      return isSignedIn() && request.auth.token.email == 'gawesh.bwela@gmail.com';
+    }
+
+    function isValidId(id) {
+      return id is string && id.size() <= 128 && id.matches('^[a-zA-Z0-9_\\-]+$');
+    }
+
+    function incoming() {
+      return request.resource.data;
+    }
+
+    function existing() {
+      return resource.data;
+    }
+
+    // --- Entity Validation ---
+
+    function isValidArticle(data) {
+      return data.keys().hasAll(['title', 'summary', 'content', 'category', 'imageUrl', 'author', 'createdAt', 'status']) &&
+             data.title is string && data.title.size() > 0 && data.title.size() <= 256 &&
+             data.summary is string && data.summary.size() <= 1024 &&
+             data.content is string && data.content.size() <= 1048576 && // 1MB content limit
+             data.category is string &&
+             data.imageUrl is string &&
+             data.author is string &&
+             data.status in ['pending', 'approved', 'rejected'] &&
+             (data.createdAt is timestamp || data.createdAt == request.time) &&
+             (!data.keys().hasAny(['sources']) || data.sources is list);
+    }
+
+    function isValidPreference(data) {
+      return data.keys().hasAll(['categories', 'updatedAt']) &&
+             data.categories is list &&
+             data.updatedAt == request.time;
+    }
+
+    function isValidProgress(data) {
+      return data.keys().hasAll(['articleId', 'lastLineRead', 'totalLines', 'isCompleted', 'updatedAt']) &&
+             data.articleId is string &&
+             data.lastLineRead is number &&
+             data.totalLines is number &&
+             data.isCompleted is bool &&
+             data.updatedAt == request.time;
+    }
+
+    function isValidDailyStats(data) {
+      return data.keys().hasAll(['chatCount', 'updatedAt']) &&
+             data.chatCount is number &&
+             data.updatedAt == request.time;
+    }
+
+    function isValidComment(data) {
+      return data.keys().hasAll(['articleId', 'userId', 'userName', 'userPhoto', 'text', 'createdAt']) &&
+             data.articleId is string &&
+             data.userId == request.auth.uid &&
+             data.userName is string &&
+             data.userPhoto is string &&
+             data.text is string && data.text.size() > 0 && data.text.size() <= 1000 &&
+             data.createdAt == request.time;
+    }
+
+    // --- Collection Rules ---
+
+    // Articles: Global read for signed in users, Admin only for write
+    match /articles/{articleId} {
+      allow read: if isSignedIn();
+      allow create: if isAdmin() && isValidArticle(incoming());
+      allow update: if isAdmin() && isValidArticle(incoming());
+      allow delete: if isAdmin();
+    }
+
+    // Comments: Global read for signed in users, Owner only for write
+    match /comments/{commentId} {
+      allow read: if isSignedIn();
+      allow create: if isSignedIn() && isValidComment(incoming());
+      allow delete: if isAdmin() || (isSignedIn() && resource.data.userId == request.auth.uid);
+    }
+
+    // Users & Subcollections
+    match /users/{userId} {
+      allow get: if isOwner(userId);
+      allow create: if isOwner(userId);
+      allow update: if isOwner(userId) && (
+        !incoming().keys().hasAny(['isAdmin']) || isProjectOwner()
+      );
+
+      // Preferences
+      match /preferences/main {
+        allow read, write: if isOwner(userId) && (request.method != 'create' && request.method != 'update' || isValidPreference(incoming()));
+      }
+
+      // Reading Progress
+      match /readingProgress/{progressId} {
+        allow read: if isOwner(userId);
+        allow create: if isOwner(userId) && isValidProgress(incoming());
+        allow update: if isOwner(userId) && isValidProgress(incoming());
+        allow delete: if isOwner(userId);
+      }
+
+      // Daily Stats
+      match /dailyStats/{date} {
+        allow read: if isOwner(userId);
+        allow create: if isOwner(userId) && isValidDailyStats(incoming()) && incoming().chatCount == 1;
+        allow update: if isOwner(userId) && isValidDailyStats(incoming()) && incoming().chatCount <= 5;
+      }
+    }
+  }
+}
