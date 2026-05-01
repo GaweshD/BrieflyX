@@ -484,12 +484,17 @@ const CommentsSection = ({ articleId, isDarkMode, user, openAuth }: { articleId:
     const q = query(
       collection(db, 'comments'),
       where('articleId', '==', articleId),
-      orderBy('createdAt', 'desc'),
       limit(50)
     );
 
     const unsubscribe = onSnapshot(q, (snapshot) => {
       const data = snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() } as Comment));
+      // Sort client-side to avoid composite index requirement
+      data.sort((a, b) => {
+        const timeA = a.createdAt?.toMillis?.() || 0;
+        const timeB = b.createdAt?.toMillis?.() || 0;
+        return timeB - timeA;
+      });
       setComments(data);
     }, (error) => {
       handleFirestoreError(error, OperationType.GET, 'comments');
@@ -1388,7 +1393,7 @@ function handleFirestoreError(error: unknown, operationType: OperationType, path
     path
   }
   console.error('Firestore Error: ', JSON.stringify(errInfo));
-  throw new Error(JSON.stringify(errInfo));
+  // Removed throw to prevent crashing the entire application in production
 }
 
 // --- Main App ---
@@ -1477,9 +1482,15 @@ export default function App() {
 
   // Listen to Articles
   useEffect(() => {
-    const q = query(collection(db, 'articles'), orderBy('createdAt', 'desc'));
+    const q = query(collection(db, 'articles'), limit(100));
     const unsub = onSnapshot(q, (snap) => {
       const arts = snap.docs.map(doc => ({ id: doc.id, ...doc.data() } as Article));
+      // Sort client-side to ensure stability without strict index requirements
+      arts.sort((a, b) => {
+        const timeA = a.createdAt?.toMillis?.() || 0;
+        const timeB = b.createdAt?.toMillis?.() || 0;
+        return timeB - timeA;
+      });
       setArticles(arts);
       setLoadingData(false);
 
