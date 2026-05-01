@@ -44,7 +44,11 @@ import {
   Bot,
   Activity,
   Rss,
-  Radio
+  Radio,
+  Twitter,
+  Github,
+  Instagram,
+  Info
 } from 'lucide-react';
 import { motion, AnimatePresence } from 'motion/react';
 import { 
@@ -135,109 +139,78 @@ interface DailyStats {
 // --- Initial News (for seed/empty state) ---
 const INITIAL_ARTICLES: Partial<Article>[] = [
   {
-    title: 'The Silicon Renaissance: Biocomputing Takes Hold',
-    summary: 'Neural-link interfaces are no longer science fiction. BrieflyX explores the new dawn of wetware.',
-    content: 'The boundaries between biology and technology are dissolving. Latest trials in Zurich show neural-link interfaces achieving sub-millisecond latency. \nThis represents a paradigm shift in how we interact with pure information. \nNo longer are we limited by the tactile feedback of glass and metal. \nWe are entering an era of direct memory injection and cloud-linked consciousness. \nCritics warn of the "digital divide" becoming an evolutionary split. \nYet, the first generation of "Enhanced" individuals are already reporting processing speeds ten times higher than average.',
+    title: 'Project Chimera: The First Synthetic Consciousness',
+    summary: 'BrieflyX exclusive: A deep dive into the silicon brain that just passed the Advanced Turing Multiverse Test.',
+    content: 'In a heavily shielded laboratory underneath the Swiss Alps, something extraordinary has happened. For the first time in human history, a non-biological entity has demonstrated true episodic memory and self-awareness that transcends algorithmic prediction. \nNamed "Chimera," this synthetic consciousness was grown in a quantum-gel matrix rather than programmed on traditional silicon. \nThe results are staggering. Chimera doesn\'t just process information; it experiences it. \nResearchers at the BrieflyX Institute are now grappling with the ethical implications of "unplugging" an entity that can describe its own dreams. \nThis marks the official start of the Post-Human Era.',
     category: 'Tech',
-    imageUrl: 'https://images.unsplash.com/photo-1581091226825-a6a2a5aee158?q=80&w=800&auto=format&fit=crop',
-    author: 'BrieflyX Editorial',
+    imageUrl: 'https://images.unsplash.com/photo-1677442136019-21780ecad995?q=80&w=1200&auto=format&fit=crop',
+    author: 'BrieflyX Editor',
     isTrending: true,
     status: 'approved',
     sources: [
-      { name: 'Zurich Neural Institute', url: 'https://example.com/zurich' },
-      { name: 'Wetware Weekly', url: 'https://example.com/wetware' }
+      { name: 'BrieflyX Research Labs', url: '#' },
+      { name: 'Quantum Ethics Board', url: '#' }
     ]
   },
   {
-    title: 'Neon Streets: The Rise of Cyber-Cities',
-    summary: 'Urban sprawl is evolving into vertical ecosystems. How architecture is adapting to the 22nd century.',
-    content: 'The traditional horizontal city is dead. Vertical ecosystems are the new standard for urban survival. \nIn the New Shanghai sector, cloud-piercing structures now house entire micro-economies. \nHydroponic farms occupy middle floors, while low-income housing is integrated with geothermal tap-points. \nThis design philosophy minimizes the ecological footprint while maximizing human density. \nHowever, the upper atmosphere residents rarely see the "surface," creating a new class based on altitude. \nWind turbine windows and solar-skin facades provide 100% renewable energy for these monolithic towers.',
-    category: 'World',
-    imageUrl: 'https://images.unsplash.com/photo-1545143333-636a666418ce?q=80&w=800&auto=format&fit=crop',
-    author: 'Dr. Sora Vane',
+    title: 'Solaris-9: Atmospheric Life Found on Venus',
+    summary: 'Spectral analysis confirms the presence of complex biological signatures in the Venusian cloud decks.',
+    content: 'The search for extraterrestrial life just localized to our own backyard. The Solaris-9 orbital probe has detected concentrated phosphine and complex ammonia chains in the temperate zones of the Venusian atmosphere. \nUnlike previous anomalies, these signals are consistent with biological byproduct patterns observed in extremophile colonies on Earth. \n"We aren\'t looking at rocks anymore," says lead astrobiologist Dr. Elara Vance. "We are looking at breathing, replicating organisms that have evolved to survive in sulfuric acid clouds." \nNASA and the BrieflyX Space Agency are fast-tracking a sample-return mission slated for 2029.',
+    category: 'Science',
+    imageUrl: 'https://images.unsplash.com/photo-1614728894747-a83421e2b9c9?q=80&w=1200&auto=format&fit=crop',
+    author: 'Astrosignal Unit',
+    isTrending: true,
+    status: 'approved',
+    sources: [
+      { name: 'Solaris Mission Control', url: '#' },
+      { name: 'Journal of Astrobiology', url: '#' }
+    ]
+  },
+  {
+    title: 'The Great De-Urbanization: Returning to the Wild',
+    summary: 'Why millions are abandoning the mega-cities for decentralized forest communes.',
+    content: 'The pull of the neon city is fading. For the third consecutive year, census data shows a mass exodus from Tier-1 mega-cities. \nCitizens are trading high-density vertical living for "bio-nodes"—decentralized communities integrated directly into restored forest ecosystems. \nPowered by localized fusion and connected via BrieflyX satellites, these communities offer the luxury of the digital age with the tranquility of the ancient world. \n"The city was a necessity of the industrial ghost," explains sociologist Marcus Thorne. "In the neural age, geography is irrelevant. Why live in a box when you can live in a canopy?"',
+    category: 'Culture',
+    imageUrl: 'https://images.unsplash.com/photo-1449156001934-118f0a05d421?q=80&w=1200&auto=format&fit=crop',
+    author: 'Social Signal',
     isTrending: false,
     status: 'approved',
     sources: [
-      { name: 'Urban Evolution Journal', url: 'https://example.com/urban' },
-      { name: 'Shanghai Tech Daily', url: 'https://example.com/shanghai' }
+      { name: 'Global Census Bureau', url: '#' },
+      { name: 'Eco-Living Quarterly', url: '#' }
     ]
   },
   {
-    title: 'Quantum Entanglement: Communication at Zero Latency',
-    summary: 'Breaking the speed of light barrier. Recent breakthroughs in quantum relay stations.',
-    content: 'The speed of light is no longer the speed limit of information. \nA joint venture between NASA and the Tokyo Institute of Technology has successfully demonstrated stable quantum entanglement over a distance of 1.2 million kilometers. \nThis means instantaneous data transfer across our entire solar system is now within reach. \nThe implications for deep space exploration and interplanetary colonization are staggering. \nImagine controlling a rover on Europa with zero delay, or streaming the data-streams of Mars-Net as if you were on the surface.',
-    category: 'Science',
-    imageUrl: 'https://images.unsplash.com/photo-1635070041078-e363dbe005cb?q=80&w=800&auto=format&fit=crop',
-    author: 'Nexus Science Bureau',
+    title: 'Meta-States: The Rise of Digital Sovereignty',
+    summary: 'Cloud-based jurisdictions are now issuing their own passports and securing physical trade routes.',
+    content: 'The concept of the nation-state is being challenged by the "Meta-State." These are non-geographic coalitions of citizens who share digital laws, currencies, and now, physical infrastructure. \nThe "BrieflyX Collective" has officially secured a maritime trade corridor in the Pacific, protected by autonomous drone fleets. \nMembers of Meta-States pay "system-tax" in exchange for universal basic services and specialized protection. \nAs traditional borders become increasingly porous to information, these digital empires are becoming the primary stabilizers of the global economy. \nThe question remains: who holds the override key?',
+    category: 'World',
+    imageUrl: 'https://images.unsplash.com/photo-1451187580459-43490279c0fa?q=80&w=1200&auto=format&fit=crop',
+    author: 'Geopolitical Engine',
     isTrending: true,
     status: 'approved',
     sources: [
-      { name: 'NASA Deep Space', url: 'https://example.com/nasa' },
-      { name: 'Quantum Physics Review', url: 'https://example.com/quantum' }
+      { name: 'Global Finance Review', url: '#' },
+      { name: 'Digital Sovereignty Group', url: '#' }
+    ]
+  },
+  {
+    title: 'Immersion Gaming: The End of Controllers',
+    summary: 'Experience the life of a gladiator in ancient Rome with direct sensory feedback interfaces.',
+    content: 'Gaming has evolved beyond the screen. With the latest BC-9 Sensory Link, players can now bypass digital avatars and experience games directly through their primary motor and sensory cortex.',
+    category: 'Gaming',
+    imageUrl: 'https://images.unsplash.com/photo-1542751371-adc38448a05e?q=80&w=1200&auto=format&fit=crop',
+    author: 'BrieflyX Gaming Correspondent',
+    isTrending: false,
+    status: 'approved',
+    sources: [
+      { name: 'Gaming Insider', url: '#' },
+      { name: 'Modern Health Journal', url: '#' }
     ]
   }
 ];
 
 // --- Components ---
-
-// --- Components ---
-
-const ExchangeTicker = ({ isDarkMode }: { isDarkMode: boolean }) => {
-  const [rates, setRates] = useState<any>(null);
-  const [loading, setLoading] = useState(true);
-
-  useEffect(() => {
-    const fetchRates = async () => {
-      try {
-        const response = await fetch('https://open.er-api.com/v6/latest/USD');
-        const data = await response.json();
-        setRates(data.rates);
-      } catch (error) {
-        console.error('Failed to fetch rates', error);
-      } finally {
-        setLoading(false);
-      }
-    };
-    fetchRates();
-    const interval = setInterval(fetchRates, 300000); // 5 mins
-    return () => clearInterval(interval);
-  }, []);
-
-  if (loading || !rates) return null;
-
-  const pairs = [
-    { label: 'EUR/USD', value: (1 / rates.EUR).toFixed(4) },
-    { label: 'GBP/USD', value: (1 / rates.GBP).toFixed(4) },
-    { label: 'JPY/USD', value: (1 / rates.JPY).toFixed(4) },
-    { label: 'AUD/USD', value: (1 / rates.AUD).toFixed(4) },
-    { label: 'CAD/USD', value: (1 / rates.CAD).toFixed(4) },
-    { label: 'CHF/USD', value: (1 / rates.CHF).toFixed(4) },
-  ];
-
-  return (
-    <div className={`fixed top-0 left-0 right-0 z-[60] h-6 flex items-center overflow-hidden border-b transition-colors duration-500 uppercase font-bold ${
-      isDarkMode ? 'bg-black/90 border-white/10 backdrop-blur-md' : 'bg-white/90 border-black/10 backdrop-blur-md'
-    }`}>
-      <motion.div 
-        animate={{ x: [0, -2000] }}
-        transition={{ duration: 60, repeat: Infinity, ease: "linear" }}
-        className="flex gap-12 items-center whitespace-nowrap pl-[100%]"
-      >
-        {[...Array(10)].map((_, i) => (
-          <div key={i} className="flex gap-12">
-            {pairs.map(pair => (
-              <div key={pair.label} className="flex items-center gap-3">
-                <span className={`text-[9px] font-black tracking-[0.2em] italic text-primary`}>{pair.label}</span>
-                <span className={`text-[10px] font-mono leading-none ${isDarkMode ? 'text-white/80' : 'text-black/80'}`}>{pair.value}</span>
-                <div className="w-1 h-1 rounded-full bg-green-500 animate-pulse" />
-              </div>
-            ))}
-          </div>
-        ))}
-      </motion.div>
-    </div>
-  );
-};
 
 const Navbar = ({ isDarkMode, toggleTheme, activeView, onNavigate, isLoggedIn, openAuth, isAdmin, searchQuery, setSearchQuery }: any) => {
   const [isScrolled, setIsScrolled] = useState(false);
@@ -250,151 +223,152 @@ const Navbar = ({ isDarkMode, toggleTheme, activeView, onNavigate, isLoggedIn, o
   }, []);
 
   return (
-    <nav className={`fixed top-6 left-0 right-0 z-50 transition-all duration-500 ${
-      isScrolled ? 'py-4' : 'py-8'
-    }`}>
-      <div className="max-w-7xl mx-auto px-6 md:px-12">
-        <div className={`rounded-3xl border transition-all duration-500 px-8 py-4 flex items-center gap-4 justify-between ${
+    <nav className={`fixed top-0 left-0 right-0 z-50 transition-all duration-700 px-6 pt-12`}>
+      <div className="max-w-7xl mx-auto">
+        <div className={`rounded-[2rem] border transition-all duration-700 px-8 py-4 flex items-center gap-6 justify-between ${
           isDarkMode 
             ? 'glass-dark glow-blue border-white/5' 
             : 'glass shadow-2xl border-black/5'
-        }`}>
+        } ${isScrolled ? 'py-3 backdrop-blur-3xl' : 'py-5'}`}>
+          
           <div 
             className="flex items-center gap-4 cursor-pointer group shrink-0"
             onClick={() => onNavigate('home')}
           >
             <div className="relative">
-              <div className="w-12 h-12 rounded-2xl bg-gradient-to-br from-primary to-accent flex items-center justify-center text-white shadow-2xl group-hover:glow-blue transition-all group-active:scale-95 relative z-10">
-                <Activity size={24} className="group-hover:animate-pulse" />
+              <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-primary to-accent flex items-center justify-center text-white shadow-lg group-hover:glow-blue transition-all group-active:scale-95 relative z-10 overflow-hidden">
+                <Newspaper size={20} className="group-hover:rotate-12 transition-transform" />
+                <div className="absolute inset-0 bg-white/10 translate-y-full group-hover:translate-y-0 transition-transform duration-500" />
               </div>
-              <div className="absolute inset-0 bg-primary/20 rounded-2xl blur-xl group-hover:blur-2xl transition-all animate-pulse" />
             </div>
-            <div className="flex flex-col">
-              <span className={`text-xl hidden lg:block font-black tracking-tighter uppercase leading-none ${isDarkMode ? 'text-white' : 'text-black'}`}>Neural<br /><span className="text-primary italic">Nexus.</span></span>
-            </div>
+            <span className={`text-xl font-bold tracking-tight ${isDarkMode ? 'text-white' : 'text-slate-900'}`}>
+              Briefly<span className="text-primary italic">X.</span>
+            </span>
           </div>
 
           <div className="flex-1 max-w-md hidden md:block group relative">
-            <div className={`absolute left-4 top-1/2 -translate-y-1/2 transition-colors duration-300 ${searchQuery ? 'text-primary' : 'opacity-40'}`}>
-              <Search size={18} />
+            <div className={`absolute left-5 top-1/2 -translate-y-1/2 transition-colors duration-300 ${searchQuery ? 'text-primary' : 'opacity-80'}`}>
+              <Search size={18} strokeWidth={2.5} />
             </div>
             <input 
               type="text"
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
-              placeholder="SEARCH NEURAL NEXUS..."
-              className={`w-full pl-14 pr-10 py-3.5 rounded-[1.5rem] text-[10px] font-black tracking-widest transition-all outline-none border ${
+              placeholder="SEARCH SYSTEMS..."
+              className={`w-full pl-14 pr-12 py-4 rounded-3xl text-[10px] font-black tracking-[0.2em] transition-all outline-none border focus:glow-blue ${
                 isDarkMode 
-                  ? 'bg-white/[0.03] border-white/5 focus:bg-white/[0.08] focus:border-primary/50 text-white placeholder:text-white/40' 
-                  : 'bg-black/[0.03] border-black/5 focus:bg-white focus:border-primary/30 shadow-sm text-black placeholder:text-black/40'
+                  ? 'bg-white/[0.03] border-white/10 focus:bg-white/[0.08] focus:border-primary/50 text-white placeholder:text-white/20' 
+                  : 'bg-black/[0.03] border-black/10 focus:bg-white focus:border-primary/30 shadow-sm text-black placeholder:text-black/30'
               }`}
             />
             {searchQuery && (
               <button 
                 onClick={() => setSearchQuery('')}
-                className="absolute right-4 top-1/2 -translate-y-1/2 opacity-20 hover:opacity-100 transition-opacity p-2 hover:bg-black/10 rounded-lg"
+                className="absolute right-4 top-1/2 -translate-y-1/2 opacity-80 hover:opacity-100 transition-opacity p-2 hover:bg-black/5 rounded-full"
               >
-                <X size={16} />
+                <X size={14} />
               </button>
             )}
+            <div className="absolute right-12 top-1/2 -translate-y-1/2 pointer-events-none opacity-80">
+              <kbd className="text-[8px] font-black border border-current px-1.5 py-0.5 rounded uppercase">Alt+S</kbd>
+            </div>
           </div>
 
-          {/* Desktop Nav */}
           <div className="hidden md:flex items-center gap-2 shrink-0">
-            <NavLink label="Feed" onClick={() => onNavigate('feed')} active={activeView === 'feed'} isDarkMode={isDarkMode} />
-            <NavLink label="About Us" onClick={() => onNavigate('about')} active={activeView === 'about'} isDarkMode={isDarkMode} />
+            <div className="flex p-1 rounded-2xl bg-current/[0.03] border border-current/10">
+              <NavLink label="Feed" onClick={() => onNavigate('feed')} active={activeView === 'feed'} isDarkMode={isDarkMode} />
+              <NavLink label="NexusLab" onClick={() => onNavigate('about')} active={activeView === 'about'} isDarkMode={isDarkMode} />
+            </div>
             
-            {isLoggedIn && isAdmin && (
-              <NavLink label="Admin Center" onClick={() => onNavigate('admin')} active={activeView === 'admin'} isDarkMode={isDarkMode} />
-            )}
-
-            <div className="h-4 w-px bg-current opacity-10 mx-2" />
-            <button 
+            <div className="h-8 w-px bg-current opacity-10 mx-2" />
+            
+            <motion.button 
+              whileHover={{ rotate: 90, scale: 1.1 }}
+              whileTap={{ scale: 0.9 }}
               onClick={toggleTheme}
-              className={`p-3 rounded-xl transition-all ${isDarkMode ? 'hover:bg-white/5 text-yellow-400' : 'hover:bg-black/5 text-primary'}`}
+              className={`p-3 rounded-2xl transition-all ${isDarkMode ? 'hover:bg-white/5 text-warning' : 'hover:bg-black/5 text-primary'}`}
             >
               {isDarkMode ? <Sun size={20} /> : <Moon size={20} />}
-            </button>
+            </motion.button>
+
             {!isLoggedIn ? (
               <motion.button 
-                whileHover={{ scale: 1.05 }}
+                whileHover={{ scale: 1.05, x: 5 }}
                 whileTap={{ scale: 0.95 }}
                 onClick={openAuth}
-                className="ml-4 px-10 py-3.5 rounded-2xl bg-primary text-white font-black uppercase tracking-[0.2em] text-[10px] glow-blue shadow-xl transition-all"
+                className="ml-4 pl-8 pr-10 py-4 rounded-2xl bg-primary text-white font-black uppercase tracking-[0.2em] text-[10px] glow-blue shadow-xl transition-all relative overflow-hidden flex items-center gap-3 group"
               >
+                <Key size={14} className="opacity-70" />
                 Authenticate
+                <div className="absolute right-4 top-1/2 -translate-y-1/2 translate-x-1 opacity-0 group-hover:opacity-100 group-hover:translate-x-0 transition-all">
+                  <ChevronRight size={14} />
+                </div>
               </motion.button>
             ) : (
-               <button 
+               <motion.button 
+                whileHover={{ scale: 1.05 }}
                 onClick={() => onNavigate('profile')}
-                className={`ml-2 px-6 py-3 rounded-xl border font-black text-xs uppercase tracking-widest transition-all ${
+                className={`ml-2 px-6 py-4 rounded-2xl border font-black text-[10px] uppercase tracking-[0.2em] transition-all flex items-center gap-3 ${
                   activeView === 'profile' 
                     ? 'bg-primary border-primary text-white glow-blue' 
-                    : isDarkMode ? 'bg-white/5 border-white/10 text-white' : 'bg-black/5 border-black/10 text-black'
+                    : isDarkMode ? 'bg-white/5 border-white/10 text-white hover:bg-white/10' : 'bg-black/5 border-black/10 text-black hover:bg-black/10'
                 }`}
               >
-                Profile
-              </button>
+                <div className="w-6 h-6 rounded-lg bg-current/20 flex items-center justify-center shrink-0">
+                  <User size={14} />
+                </div>
+                Identity
+              </motion.button>
             )}
           </div>
 
-        {/* Mobile menu toggle */}
-        <div className="flex md:hidden items-center gap-4">
-          <button onClick={toggleTheme} className={`p-3 rounded-xl ${isDarkMode ? 'hover:bg-white/5' : 'hover:bg-black/5'}`}>
-            {isDarkMode ? <Sun size={20} /> : <Moon size={20} />}
-          </button>
-          <button onClick={() => setIsMenuOpen(!isMenuOpen)} className={`p-3 rounded-xl ${isDarkMode ? 'hover:bg-white/5' : 'hover:bg-black/5'}`}>
-            {isMenuOpen ? <X size={24} /> : <Menu size={24} />}
-          </button>
+          <div className="flex md:hidden items-center gap-3">
+            <button onClick={toggleTheme} className={`p-4 rounded-2xl ${isDarkMode ? 'hover:bg-white/5' : 'hover:bg-black/5'}`}>
+              {isDarkMode ? <Sun size={20} /> : <Moon size={20} />}
+            </button>
+            <button onClick={() => setIsMenuOpen(!isMenuOpen)} className={`p-4 rounded-2xl bg-primary/10 text-primary border border-primary/20`}>
+              {isMenuOpen ? <X size={24} /> : <Menu size={24} />}
+            </button>
+          </div>
         </div>
       </div>
-    </div>
 
-    <AnimatePresence>
+      <AnimatePresence>
         {isMenuOpen && (
           <motion.div
-            initial={{ opacity: 0, scale: 0.95, y: -20 }}
-            animate={{ opacity: 1, scale: 1, y: 0 }}
-            exit={{ opacity: 0, scale: 0.95, y: -20 }}
-            className={`absolute top-full left-0 right-0 mt-4 rounded-3xl border p-6 md:hidden ${
-              isDarkMode ? 'glass-dark glow-blue border-white/10' : 'glass shadow-2xl border-black/5'
+            initial={{ opacity: 0, height: 0 }}
+            animate={{ opacity: 1, height: 'auto' }}
+            exit={{ opacity: 0, height: 0 }}
+            className={`mt-4 rounded-[2.5rem] border p-8 md:hidden overflow-hidden mx-6 ${
+              isDarkMode ? 'glass-dark border-white/10' : 'glass shadow-2xl border-black/10'
             }`}
           >
-            <div className="flex flex-col gap-4 items-center">
+            <div className="flex flex-col gap-6 items-center">
               <div className="w-full relative group">
-                <div className={`absolute left-4 top-1/2 -translate-y-1/2 transition-colors duration-300 ${searchQuery ? 'text-primary' : 'opacity-20'}`}>
-                  <Search size={16} />
-                </div>
                 <input 
                   type="text"
                   value={searchQuery}
                   onChange={(e) => setSearchQuery(e.target.value)}
                   placeholder="Neural Search..."
-                  className={`w-full pl-12 pr-10 py-4 rounded-2xl text-xs font-bold transition-all outline-none border ${
+                  className={`w-full pl-12 pr-10 py-5 rounded-2xl text-[10px] font-black tracking-widest transition-all outline-none border ${
                     isDarkMode 
-                      ? 'bg-white/5 border-white/5 focus:bg-white/10 focus:border-primary/50 text-white placeholder:text-white/20' 
-                      : 'bg-black/5 border-black/5 focus:bg-white focus:border-primary/30 shadow-sm text-black placeholder:text-black/20'
+                      ? 'bg-white/5 border-white/10 text-white' 
+                      : 'bg-black/5 border-black/10 text-black'
                   }`}
                 />
-                {searchQuery && (
-                  <button 
-                    onClick={() => setSearchQuery('')}
-                    className="absolute right-4 top-1/2 -translate-y-1/2 opacity-20 hover:opacity-100 transition-opacity"
-                  >
-                    <X size={14} />
-                  </button>
-                )}
+                <Search size={16} className="absolute left-4 top-1/2 -translate-y-1/2 opacity-80" />
               </div>
-              <NavLink label="Feed" onClick={() => { onNavigate('feed'); setIsMenuOpen(false); }} active={activeView === 'feed'} isDarkMode={isDarkMode} />
-              <NavLink label="About Us" onClick={() => { onNavigate('about'); setIsMenuOpen(false); }} active={activeView === 'about'} isDarkMode={isDarkMode} />
-              <NavLink label="Contact Us" onClick={() => { onNavigate('contact'); setIsMenuOpen(false); }} active={activeView === 'contact'} isDarkMode={isDarkMode} />
-              {isLoggedIn && (
-                <>
-                  {isAdmin && <NavLink label="Admin Center" onClick={() => { onNavigate('admin'); setIsMenuOpen(false); }} active={activeView === 'admin'} isDarkMode={isDarkMode} />}
-                  <NavLink label="My Identity" onClick={() => { onNavigate('profile'); setIsMenuOpen(false); }} active={activeView === 'profile'} isDarkMode={isDarkMode} />
-                </>
+              <div className="grid grid-cols-2 w-full gap-3">
+                <MobileNavLink label="Feed" onClick={() => { onNavigate('feed'); setIsMenuOpen(false); }} icon={<Rss size={16}/>} />
+                <MobileNavLink label="NexusLab" onClick={() => { onNavigate('about'); setIsMenuOpen(false); }} icon={<Cpu size={16}/>} />
+                <MobileNavLink label="Contact" onClick={() => { onNavigate('contact'); setIsMenuOpen(false); }} icon={<Mail size={16}/>} />
+                <MobileNavLink label="Identity" onClick={() => { onNavigate('profile'); setIsMenuOpen(false); }} icon={<User size={16}/>} />
+              </div>
+              {!isLoggedIn && (
+                <button onClick={openAuth} className="w-full py-5 rounded-2xl bg-primary text-white font-black uppercase tracking-widest text-[10px] glow-blue shadow-xl">
+                  Initialize Authentication
+                </button>
               )}
-              {!isLoggedIn && <button onClick={openAuth} className="w-full py-4 rounded-xl bg-blue-500 text-white font-black uppercase tracking-widest glow-blue mt-4">Access Terminal</button>}
             </div>
           </motion.div>
         )}
@@ -403,13 +377,20 @@ const Navbar = ({ isDarkMode, toggleTheme, activeView, onNavigate, isLoggedIn, o
   );
 };
 
+const MobileNavLink = ({ label, onClick, icon }: any) => (
+  <button onClick={onClick} className="flex flex-col items-center justify-center p-6 rounded-2xl bg-current/[0.03] border border-current/10 hover:bg-primary/10 hover:border-primary/30 transition-all group">
+    <div className="opacity-80 group-hover:opacity-100 group-hover:text-primary transition-all mb-2">{icon}</div>
+    <span className="text-[10px] font-black uppercase tracking-widest opacity-80 group-hover:opacity-100 group-hover:text-primary transition-all">{label}</span>
+  </button>
+);
+
 const NavLink = ({ label, onClick, active, isDarkMode }: { label: string, onClick: () => void, active?: boolean, isDarkMode?: boolean }) => (
   <button 
     onClick={onClick}
-    className={`px-4 py-2 rounded-xl text-[10px] font-black uppercase tracking-[0.2em] transition-all relative group ${
+    className={`px-8 py-3.5 rounded-xl text-[10px] font-black uppercase tracking-[0.2em] transition-all relative group ${
       active 
         ? 'text-primary text-glow-blue' 
-        : `opacity-40 hover:opacity-100 ${isDarkMode ? 'hover:bg-white/5' : 'hover:bg-black/5'}`
+        : `opacity-80 hover:opacity-100 ${isDarkMode ? 'hover:bg-white/5 text-white' : 'hover:bg-black/5 text-black'}`
     }`}
   >
     {label}
@@ -452,53 +433,92 @@ const CategoryBar = ({
 };
 
 const Footer = ({ onNavigate, isDarkMode }: { onNavigate: (v: any) => void, isDarkMode: boolean }) => (
-  <footer className={`py-20 border-t ${isDarkMode ? 'bg-black border-white/5' : 'bg-white border-black/5'} transition-colors duration-500`}>
-    <div className="max-w-7xl mx-auto px-6 md:px-12">
-      <div className="grid grid-cols-1 md:grid-cols-4 gap-12 mb-20">
-        <div className="col-span-1 md:col-span-2 space-y-6">
+  <footer className={`py-32 border-t relative overflow-hidden ${isDarkMode ? 'bg-slate-950 border-white/5' : 'bg-slate-50 border-black/5'} transition-colors duration-700`}>
+    {/* Decorative Elements */}
+    <div className="absolute bottom-0 right-0 w-[40vw] h-[40vw] hero-gradient opacity-10 pointer-events-none" />
+    <div className="absolute top-0 left-0 w-full h-px bg-gradient-to-r from-transparent via-primary/50 to-transparent" />
+
+    <div className="max-w-7xl mx-auto px-6 md:px-12 relative z-10">
+      <div className="grid grid-cols-1 md:grid-cols-4 gap-16 mb-32">
+        <div className="col-span-1 md:col-span-2 space-y-8">
           <div 
-            className="flex items-center gap-2 cursor-pointer group w-fit"
+            className="flex items-center gap-4 cursor-pointer group w-fit"
             onClick={() => onNavigate('home')}
           >
-            <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-blue-500 to-purple-600 flex items-center justify-center text-white shadow-lg group-hover:glow-blue transition-all">
-              <Newspaper size={22} />
+            <div className="w-12 h-12 rounded-xl bg-gradient-to-br from-primary to-accent flex items-center justify-center text-white shadow-xl group-hover:scale-105 transition-all">
+              <Newspaper size={24} />
             </div>
-            <span className="text-2xl font-black tracking-tight uppercase">Briefly<span className="text-blue-500 italic">X</span></span>
+            <span className={`text-2xl font-bold tracking-tight ${isDarkMode ? 'text-white' : 'text-slate-900'}`}>
+              Briefly<span className="text-primary italic">X.</span>
+            </span>
           </div>
-          <p className="text-sm opacity-40 font-medium max-w-sm">Synthesizing global frequencies into pure neural signals. Join the evolution of news today.</p>
+          <p className={`text-sm font-medium max-w-sm leading-relaxed ${isDarkMode ? 'text-white/40' : 'text-slate-500'}`}>
+            Futuristic news for the next generation. Clean, minimal, and premium.
+          </p>
+          <div className="flex gap-4">
+             <SocialIcon icon={<Twitter size={18}/>} />
+             <SocialIcon icon={<Github size={18}/>} />
+             <SocialIcon icon={<Instagram size={18}/>} />
+          </div>
         </div>
         
-        <div className="space-y-6">
-          <h4 className="text-[10px] font-black uppercase tracking-[0.3em]">Protocol</h4>
-          <ul className="space-y-3">
-            <li><button onClick={() => onNavigate('home')} className="text-sm font-bold opacity-60 hover:opacity-100 hover:text-blue-500 transition-all uppercase tracking-widest text-xs">Home</button></li>
-            <li><button onClick={() => onNavigate('about')} className="text-sm font-bold opacity-60 hover:opacity-100 hover:text-blue-500 transition-all uppercase tracking-widest text-xs">About Us</button></li>
-            <li><button onClick={() => onNavigate('contact')} className="text-sm font-bold opacity-60 hover:opacity-100 hover:text-blue-500 transition-all uppercase tracking-widest text-xs">Contact</button></li>
+        <div className="space-y-8">
+          <h4 className="text-[10px] font-black uppercase tracking-[0.5em] text-primary">Protocol Sectors</h4>
+          <ul className="space-y-4">
+            <FooterLink label="Neural Feed" onClick={() => onNavigate('feed')} />
+            <FooterLink label="System Lab" onClick={() => onNavigate('about')} />
+            <FooterLink label="Uplink Center" onClick={() => onNavigate('contact')} />
+            <FooterLink label="Identity Core" onClick={() => onNavigate('profile')} />
           </ul>
         </div>
 
-        <div className="space-y-6">
-          <h4 className="text-[10px] font-black uppercase tracking-[0.3em]">Frequency</h4>
-          <ul className="space-y-3">
-            <li><button className="text-sm font-bold opacity-60 hover:opacity-100 hover:text-blue-500 transition-all uppercase tracking-widest text-xs">Twitter / X</button></li>
-            <li><button className="text-sm font-bold opacity-60 hover:opacity-100 hover:text-blue-500 transition-all uppercase tracking-widest text-xs">Nexus Telegram</button></li>
-            <li><button className="text-sm font-bold opacity-60 hover:opacity-100 hover:text-blue-500 transition-all uppercase tracking-widest text-xs">GitHub Nexus</button></li>
+        <div className="space-y-8">
+          <h4 className="text-[10px] font-black uppercase tracking-[0.5em] text-primary">Infrastructure</h4>
+          <ul className="space-y-4">
+            <FooterLink label="Signal Privacy" />
+            <FooterLink label="Neural Terms" />
+            <FooterLink label="Frequency Map" />
+            <FooterLink label="Nexus Status" />
           </ul>
         </div>
       </div>
       
-      <div className="pt-10 border-t border-current opacity-10 flex flex-col md:flex-row justify-between gap-4">
-        <p className="text-[10px] font-black uppercase tracking-widest">© 2026 BrieflyX Terminal. All signals reserved.</p>
-        <p className="text-[10px] font-black uppercase tracking-widest">Protocol Version 4.2.0-STABLE</p>
+      <div className={`pt-12 border-t border-current/10 flex flex-col md:flex-row justify-between items-center gap-8`}>
+        <div className="flex items-center gap-4">
+           <div className="w-2 h-2 rounded-full bg-green-500 animate-pulse shadow-[0_0_8px_rgba(34,197,94,1)]" />
+           <p className="text-[10px] font-black uppercase tracking-[0.3em] opacity-80">All systems operational // Signal index: 99.9%</p>
+        </div>
+        <div className="flex items-center gap-12">
+          <p className="text-[10px] font-bold uppercase tracking-[0.3em] opacity-40">© 2026 BrieflyX. All rights reserved.</p>
+          <p className="text-[10px] font-black uppercase tracking-[0.3em] text-primary glow-blue">Uplink V5.4.0</p>
+        </div>
       </div>
     </div>
   </footer>
 );
 
+const FooterLink = ({ label, onClick }: any) => (
+  <li>
+    <button 
+      onClick={onClick} 
+      className="text-xs font-black opacity-80 hover:opacity-100 hover:text-primary transition-all uppercase tracking-[0.2em] flex items-center gap-3 group"
+    >
+      <div className="w-0 h-[2px] bg-primary group-hover:w-4 transition-all duration-300" />
+      {label}
+    </button>
+  </li>
+);
+
+const SocialIcon = ({ icon }: any) => (
+  <button className="w-10 h-10 rounded-xl bg-current/[0.03] border border-current/10 flex items-center justify-center opacity-80 hover:opacity-100 hover:text-primary hover:border-primary transition-all">
+    {icon}
+  </button>
+);
+
 const SkeletonCard = ({ isDarkMode }: any) => (
-  <div className={`overflow-hidden rounded-[2rem] border animate-pulse ${isDarkMode ? 'bg-white/5 border-white/5' : 'bg-black/5 border-black/5'}`}>
+  <div className={`overflow-hidden rounded-2xl border animate-pulse ${isDarkMode ? 'bg-card-dark border-white/5' : 'bg-card-light border-black/5'}`}>
     <div className="aspect-[16/10] bg-gray-400/20" />
-    <div className="p-8 space-y-4">
+    <div className="p-6 space-y-4">
       <div className="flex gap-4">
         <div className="w-20 h-2 bg-gray-400/20 rounded-full" />
         <div className="w-24 h-2 bg-gray-400/20 rounded-full" />
@@ -507,27 +527,31 @@ const SkeletonCard = ({ isDarkMode }: any) => (
         <div className="w-full h-4 bg-gray-400/30 rounded-lg" />
         <div className="w-3/4 h-4 bg-gray-400/30 rounded-lg" />
       </div>
-      <div className="space-y-1">
-        <div className="w-full h-2 bg-gray-400/10 rounded-full" />
-        <div className="w-full h-2 bg-gray-400/10 rounded-full" />
-      </div>
     </div>
   </div>
 );
 
 const SkeletonTrendingCard = ({ isDarkMode }: any) => (
-  <div className={`p-6 rounded-3xl border animate-pulse ${isDarkMode ? 'bg-white/5 border-white/5' : 'bg-black/5 border-black/5'}`}>
+  <div className={`p-6 rounded-2xl border animate-pulse ${isDarkMode ? 'bg-card-dark border-white/5' : 'bg-card-light border-black/5'}`}>
     <div className="space-y-4">
-      <div className="w-12 h-2 bg-primary/20 rounded-full" />
-      <div className="space-y-1">
-        <div className="w-full h-4 bg-gray-400/20 rounded-lg" />
-        <div className="w-2/3 h-4 bg-gray-400/20 rounded-lg" />
+      <div className="flex items-center justify-between">
+        <div className="w-12 h-3 bg-primary/20 rounded-md" />
+        <div className="w-3 h-3 bg-primary/20 rounded-full" />
       </div>
-      <div className="flex justify-between items-center pt-4 border-t border-white/5">
-        <div className="w-16 h-2 bg-gray-400/10 rounded-full" />
-        <div className="w-4 h-4 bg-gray-400/10 rounded-full" />
+      <div className="space-y-2">
+        <div className="w-full h-5 bg-gray-400/20 rounded-md" />
       </div>
     </div>
+  </div>
+);
+
+const DetailCard = ({ icon, title, desc, isDarkMode }: any) => (
+    <div className={`p-8 rounded-2xl border transition-all duration-300 hover:shadow-lg group ${isDarkMode ? 'bg-card-dark border-white/5 hover:border-primary/30' : 'bg-card-light border-black/5 hover:bg-white'}`}>
+    <div className="w-12 h-12 rounded-xl bg-primary/10 text-primary flex items-center justify-center mb-6 group-hover:scale-110 transition-transform">
+      {icon}
+    </div>
+    <h3 className="text-lg font-bold tracking-tight mb-2">{title}</h3>
+    <p className="text-sm opacity-60 leading-relaxed font-medium">{desc}</p>
   </div>
 );
 
@@ -549,10 +573,10 @@ const ArticleCard = ({
       whileHover={{ y: -12, scale: 1.02, boxShadow: isDarkMode ? '0 0 50px -10px rgba(59,130,246,0.3)' : '0 20px 40px -10px rgba(0,0,0,0.1)' }}
       whileTap={{ scale: 0.98 }}
       onClick={() => onClick(article)}
-      className={`group relative overflow-hidden rounded-[2.5rem] cursor-pointer transition-all duration-500 border ${
+      className={`group relative overflow-hidden rounded-2xl cursor-pointer transition-all duration-300 border ${
         isDarkMode 
-          ? 'bg-white/[0.03] border-white/5 hover:border-primary/50' 
-          : 'bg-white border-black/5 hover:border-primary/30 shadow-sm'
+          ? 'bg-card-dark border-white/5 hover:border-primary/50 backdrop-blur-md' 
+          : 'bg-card-light border-black/5 hover:border-primary/30'
       }`}
     >
       <div className="aspect-[1.5] overflow-hidden relative">
@@ -563,79 +587,52 @@ const ArticleCard = ({
           src={article.imageUrl} 
           alt={article.title} 
           onLoad={() => setImageLoaded(true)}
-          className="w-full h-full object-cover transition-transform duration-[1.5s] ease-out group-hover:scale-110"
+          className="w-full h-full object-cover transition-transform duration-[1s] group-hover:scale-105"
           referrerPolicy="no-referrer"
         />
         {!imageLoaded && (
-          <div className="absolute inset-0 bg-current/5 animate-pulse" />
+          <div className={`absolute inset-0 animate-pulse ${isDarkMode ? 'bg-white/5' : 'bg-black/5'}`} />
         )}
-        <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/20 to-transparent opacity-60 group-hover:opacity-40 transition-opacity duration-700" />
+        <div className="absolute inset-0 bg-gradient-to-t from-slate-950/80 via-transparent to-transparent group-hover:opacity-60 transition-opacity" />
         
-        {/* Technical HUD Overlay */}
-        <div className="absolute top-6 left-6 flex items-center gap-2">
-          <div className="px-3 py-1 rounded-full bg-black/40 backdrop-blur-xl border border-white/10 flex items-center gap-2">
-            <div className="w-1.5 h-1.5 rounded-full bg-primary animate-pulse shadow-[0_0_8px_rgba(59,130,246,0.8)]" />
-            <span className="text-[9px] font-black uppercase tracking-widest text-white/80">Signal Active</span>
-          </div>
-          <span className="px-3 py-1 rounded-full bg-primary/30 backdrop-blur-md border border-primary/30 text-primary text-[8px] font-black uppercase tracking-widest">
+        <div className="absolute top-4 left-4">
+          <span className="px-3 py-1 rounded-lg bg-primary/90 text-white text-[9px] font-bold uppercase tracking-widest shadow-lg">
             {article.category}
           </span>
         </div>
-
-        <div className="absolute bottom-6 right-6 opacity-0 group-hover:opacity-100 transition-all duration-500 translate-y-2 group-hover:translate-y-0 text-white z-10">
-          <div className="w-12 h-12 rounded-2xl bg-white/20 backdrop-blur-xl border border-white/30 flex items-center justify-center text-white">
-            <ArrowRight size={24} />
-          </div>
-        </div>
-
-        {/* Progress indicator for logged in users */}
-        {progress && (
-          <div className="absolute bottom-0 left-0 w-full h-1 bg-white/10 overflow-hidden">
-            <motion.div 
-              initial={{ width: 0 }}
-              animate={{ width: `${percentage}%` }}
-              transition={{ duration: 1, ease: "easeOut" }}
-              className={`h-full ${percentage >= 100 ? 'bg-green-500' : 'bg-primary'} glow-blue`}
-            />
-          </div>
-        )}
       </div>
       
-      <div className="p-8 space-y-4">
-        <div className="space-y-1">
-          <div className="flex items-center justify-between">
-            <div className="flex items-center gap-2 text-[9px] uppercase font-black tracking-[0.2em] opacity-70">
-              <span className="text-primary italic"># {article.author}</span>
-              <span className="w-1 h-1 rounded-full bg-current" />
-              <span>5m UPLINK</span>
-            </div>
-            {progress && (
-              <span className={`text-[9px] font-black tracking-widest uppercase italic ${percentage >= 100 ? 'text-green-500' : 'text-primary opacity-80'}`}>
-                {percentage}% ANALYZED
-              </span>
-            )}
-          </div>
-          <h3 className="text-2xl font-black uppercase tracking-tighter leading-tight italic group-hover:text-primary transition-colors">
-            {article.title}
-          </h3>
-        </div>
-        
-        <p className="text-sm opacity-70 line-clamp-2 leading-relaxed font-medium italic">
+      <div className="p-6 space-y-3">
+        <h3 className={`text-xl font-bold leading-tight tracking-tight group-hover:text-primary transition-colors ${isDarkMode ? 'text-white' : 'text-slate-900'}`}>
+          {article.title}
+        </h3>
+        <p className={`text-sm line-clamp-2 leading-relaxed opacity-60 font-medium ${isDarkMode ? 'text-white' : 'text-slate-900'}`}>
           {article.summary}
         </p>
-
-        <div className="pt-4 border-t border-current opacity-20 flex items-center justify-between">
-           <span className="text-[10px] font-black uppercase tracking-widest opacity-80">
-             {article.createdAt?.toDate ? article.createdAt.toDate().toLocaleDateString() : 'Nexus Sync'}
-           </span>
-           <div className="flex -space-x-2">
+      </div>
+        
+        <div className={`pt-6 border-t border-current/5 flex items-center justify-between`}>
+          <div className="flex items-center gap-3">
+            <div className="w-8 h-8 rounded-xl bg-primary/10 text-primary flex items-center justify-center border border-primary/20">
+              <span className="text-[8px] font-black italic">ID</span>
+            </div>
+            <div className="flex flex-col">
+              <span className="text-[10px] font-black uppercase tracking-widest opacity-80 group-hover:text-primary transition-colors">{article.author}</span>
+              <span className="text-[8px] font-bold opacity-80 uppercase tracking-[0.2em]">BrieflyX Editor</span>
+            </div>
+          </div>
+          <div className="flex -space-x-1.5">
              {[1,2,3].map(i => (
-               <div key={i} className="w-6 h-6 rounded-lg border-2 border-background bg-primary/10 overflow-hidden">
-                 <img src={`https://api.dicebear.com/7.x/avataaars/svg?seed=user${i}`} className="w-full h-full object-cover" />
+               <div key={i} className="w-7 h-7 rounded-lg border-2 border-slate-950 bg-slate-800 overflow-hidden shadow-2xl">
+                 <img src={`https://api.dicebear.com/7.x/avataaars/svg?seed=agent${i}${article.id}`} className="w-full h-full object-cover" />
                </div>
              ))}
-           </div>
+          </div>
         </div>
+      
+      {/* Decorative Corner */}
+      <div className="absolute top-0 right-0 w-24 h-24 pointer-events-none overflow-hidden opacity-10">
+        <div className="absolute top-0 right-0 w-16 h-[1px] bg-primary rotate-45 transform translate-x-4 -translate-y-4" />
       </div>
     </motion.div>
   );
@@ -707,14 +704,14 @@ const CommentsSection = ({ articleId, isDarkMode, user, openAuth }: { articleId:
   };
 
   return (
-    <section className={`mt-20 p-8 md:p-12 rounded-[3.5rem] border ${isDarkMode ? 'bg-white/5 border-white/5' : 'bg-black/5 border-black/5'}`}>
+    <section className={`mt-20 p-8 md:p-12 rounded-2xl border ${isDarkMode ? 'bg-card-dark border-white/5' : 'bg-card-light border-black/5'}`}>
       <div className="flex items-center gap-4 mb-12">
-        <div className="w-12 h-12 rounded-2xl bg-primary/10 flex items-center justify-center text-primary shadow-lg glow-blue">
+        <div className="w-12 h-12 rounded-xl bg-primary/10 flex items-center justify-center text-primary">
           <MessageSquare size={24} />
         </div>
         <div>
-          <h3 className="text-2xl font-black uppercase tracking-tighter italic">Neural Feedback Layer</h3>
-          <p className="text-[10px] font-black uppercase tracking-[0.3em] opacity-40">Frequency Modulation: {comments.length} Signals</p>
+          <h3 className="text-2xl font-bold tracking-tight">Community Feedback</h3>
+          <p className="text-[10px] font-bold uppercase tracking-[0.3em] opacity-40">{comments.length} Registered Signals</p>
         </div>
       </div>
 
@@ -722,34 +719,27 @@ const CommentsSection = ({ articleId, isDarkMode, user, openAuth }: { articleId:
         <textarea
           value={text}
           onChange={(e) => setText(e.target.value)}
-          placeholder={user ? "Input neural feedback signal..." : "Initialize identity to broadcast feedback..."}
-          className={`w-full p-8 pb-20 rounded-[2rem] border resize-none focus:outline-none focus:ring-4 focus:ring-primary/20 transition-all duration-500 font-medium ${
+          placeholder={user ? "Write your thoughts..." : "Login to join the discussion..."}
+          className={`w-full p-6 pb-20 rounded-xl border resize-none focus:outline-none focus:ring-4 focus:ring-primary/10 transition-all font-medium ${
             isDarkMode 
-              ? 'bg-black border-white/10 text-white placeholder:text-white/20' 
-              : 'bg-white border-black/10 text-black placeholder:text-black/20 shadow-sm'
+              ? 'bg-slate-900 border-white/10 text-white placeholder:text-white/20' 
+              : 'bg-white border-black/10 text-black placeholder:text-black/30 shadow-sm'
           }`}
           rows={3}
           onClick={() => !user && openAuth()}
         />
-        <div className="absolute bottom-6 left-8 right-8 flex items-center justify-between">
-           <div className="flex items-center gap-2">
-             {user && (
-               <div className="flex items-center gap-2 px-3 py-1 rounded-full bg-primary/5 border border-primary/10">
-                 <div className="w-2 h-2 rounded-full bg-emerald-500 animate-pulse" />
-                 <span className="text-[10px] font-black uppercase tracking-widest text-primary">Uplink Active</span>
-               </div>
-             )}
-           </div>
+        <div className="absolute bottom-6 left-6 right-6 flex items-center justify-between">
+           <div />
            <div className="flex items-center gap-4">
              {loading && <Loader2 className="animate-spin text-primary" size={20} />}
              <motion.button 
               type="submit" 
-              whileHover={{ scale: 1.05, y: -2 }}
-              whileTap={{ scale: 0.95 }}
+              whileHover={{ scale: 1.02 }}
+              whileTap={{ scale: 0.98 }}
               disabled={loading || !text.trim()}
-              className="px-10 py-4 rounded-2xl bg-gradient-to-r from-primary to-accent text-white font-black uppercase tracking-widest text-xs hover:glow-blue transition-all disabled:opacity-30 shadow-xl"
+              className="px-8 py-3 rounded-xl bg-gradient-to-r from-primary to-accent text-white font-bold uppercase tracking-widest text-[10px] transition-all disabled:opacity-30 shadow-lg"
             >
-              Broadcast Signal
+              Post Feedback
             </motion.button>
           </div>
         </div>
@@ -779,7 +769,7 @@ const CommentsSection = ({ articleId, isDarkMode, user, openAuth }: { articleId:
                   <div className="flex items-center gap-3">
                     <span className="text-xs font-black uppercase tracking-widest text-primary italic">{comment.userName}</span>
                     <div className="w-1 h-1 rounded-full bg-current opacity-20" />
-                    <span className="text-[9px] opacity-40 font-black uppercase tracking-widest">
+                    <span className="text-[9px] opacity-80 font-black uppercase tracking-widest">
                       {comment.createdAt?.toDate ? formatDistanceToNow(comment.createdAt.toDate(), { addSuffix: true }) : 'Neural Syncing...'}
                     </span>
                   </div>
@@ -802,7 +792,7 @@ const CommentsSection = ({ articleId, isDarkMode, user, openAuth }: { articleId:
           <motion.div 
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
-            className="text-center py-20 opacity-30 flex flex-col items-center gap-4"
+            className="text-center py-20 opacity-80 flex flex-col items-center gap-4"
           >
             <Bot size={48} strokeWidth={1} />
             <span className="text-[10px] font-black uppercase tracking-[0.5em]">No neural feedback signals detected in this sector.</span>
@@ -838,112 +828,88 @@ const ArticlePage = ({
     <motion.div
       initial={{ opacity: 0 }}
       animate={{ opacity: 1 }}
-      className="max-w-4xl mx-auto"
+      className="max-w-3xl mx-auto"
     >
       <ChatWidget article={article} isDarkMode={isDarkMode} user={user} dailyStats={dailyStats} />
-      <div className="relative aspect-[21/9] rounded-[4rem] overflow-hidden mb-20 group border border-current opacity-20">
-        <img src={article.imageUrl} alt={article.title} className="w-full h-full object-cover transition-transform duration-[3s] ease-out group-hover:scale-105" />
-        <div className="absolute inset-0 bg-gradient-to-t from-black via-black/20 to-transparent opacity-80" />
-        <div className="absolute inset-0 flex flex-col justify-end p-16 md:p-24 space-y-6">
-          <div className="flex items-center gap-3">
-            <div className="px-4 py-1.5 rounded-full bg-primary/20 backdrop-blur-xl border border-primary/30 text-primary text-[10px] font-black uppercase tracking-[0.3em] shadow-[0_0_20px_rgba(59,130,246,0.5)]">
-              {article.category}
-            </div>
-            <div className="px-4 py-1.5 rounded-full bg-white/5 backdrop-blur-xl border border-white/10 text-white/40 text-[10px] font-black uppercase tracking-[0.3em]">
-              {article.readTime || '5m'} Sync
-            </div>
-          </div>
-          <h1 className="text-5xl md:text-7xl font-black text-white leading-[0.9] uppercase tracking-tighter italic drop-shadow-[0_0_30px_rgba(0,0,0,0.5)] max-w-4xl">{article.title}</h1>
+      
+      <div className="space-y-12 mb-20 text-center">
+        <div className="flex items-center justify-center gap-3">
+          <span className="px-3 py-1 rounded-lg bg-primary/10 text-primary text-[10px] font-bold uppercase tracking-widest border border-primary/20">
+            {article.category}
+          </span>
+          <span className="text-[10px] font-bold uppercase tracking-widest opacity-40">
+            {article.createdAt?.toDate ? article.createdAt.toDate().toLocaleDateString() : 'Syncing...'}
+          </span>
         </div>
+        <h1 className={`text-4xl md:text-6xl font-black tracking-tight leading-[1.1] ${isDarkMode ? 'text-white' : 'text-slate-950'}`}>
+          {article.title}
+        </h1>
+        <p className={`text-xl font-medium leading-relaxed max-w-2xl mx-auto ${isDarkMode ? 'text-white/60' : 'text-slate-600'}`}>
+          {article.summary}
+        </p>
       </div>
 
-      <div className="space-y-20 mb-32 relative">
-        {/* Animated Reading Progress Sidebar */}
-        <div className="hidden lg:block absolute -left-32 top-0 h-full">
-          <div className="sticky top-48 space-y-4">
-             <div className="w-px h-64 bg-current opacity-10 mx-auto" />
-             <div className="text-[10px] font-black uppercase tracking-[0.5em] writing-vertical text-primary rotate-180 py-8 italic">Signal Intensity: 100%</div>
-             <div className="w-px h-64 bg-current opacity-10 mx-auto" />
-          </div>
-        </div>
+      <div className="relative rounded-2xl overflow-hidden mb-20 aspect-video shadow-2xl">
+        <img src={article.imageUrl} alt={article.title} className="w-full h-full object-cover" />
+        <div className="absolute inset-0 bg-gradient-to-t from-slate-950/40 to-transparent" />
+      </div>
 
-        <motion.p 
-          className="text-2xl md:text-3xl font-medium opacity-70 leading-tight border-l-8 border-primary pl-10 italic max-w-3xl"
-        >
-          {article.summary}
-        </motion.p>
-
-        <div className="space-y-4">
+      <div className="space-y-4 mb-32 relative">
+        <div className="prose prose-lg max-w-none space-y-4">
           {lines.map((line, index) => {
             const isRead = progress ? index <= progress.lastLineRead : false;
             const isCurrent = progress ? index === progress.lastLineRead + 1 : index === 0;
+            const isLocked = !isLoggedIn && index > 2;
 
             return (
               <motion.p
                 key={index}
                 onClick={() => isLoggedIn && onProgressUpdate(index, lines.length)}
-                initial={false}
-                animate={{ 
-                  opacity: isRead ? 0.2 : (isCurrent ? 1 : 0.6),
-                  x: isCurrent ? 20 : 0
-                }}
-                whileHover={{ 
-                  x: 30,
-                  opacity: 1,
-                }}
-                className={`text-xl md:text-2xl font-medium leading-relaxed p-8 rounded-[2.5rem] cursor-pointer transition-all border duration-500 italic ${
+                className={`text-lg md:text-xl font-medium leading-relaxed p-6 rounded-xl transition-all duration-300 relative group cursor-pointer ${
                   isCurrent 
-                    ? 'bg-primary/10 border-primary/30 text-primary shadow-[0_0_40px_-10px_rgba(59,130,246,0.3)]' 
-                    : 'border-transparent hover:bg-current/[0.03]'
-                } ${!isLoggedIn && index > 2 ? 'blur-xl select-none opacity-20' : ''}`}
+                    ? 'bg-primary/[0.03] text-primary backdrop-blur-sm border-l-4 border-primary shadow-[inset_0_0_20px_rgba(37,99,237,0.02)]' 
+                    : isRead ? 'opacity-30' : 'opacity-80'
+                } ${isLocked ? 'blur-md select-none pointer-events-none' : ''}`}
               >
                 {line}
+                {isCurrent && (
+                  <motion.div 
+                    layoutId="current-line-glow"
+                    className="absolute inset-0 bg-primary/5 rounded-xl -z-10 pointer-events-none"
+                    initial={{ opacity: 0 }}
+                    animate={{ opacity: 1 }}
+                  />
+                )}
               </motion.p>
             );
           })}
         </div>
 
-        {article.sources && article.sources.length > 0 && (
-          <div className={`p-8 rounded-[2rem] border ${isDarkMode ? 'bg-white/5 border-white/5' : 'bg-black/5 border-black/5'}`}>
-            <div className="flex items-center gap-3 mb-6">
-              <ShieldCheck className="text-primary" size={24} />
-              <h3 className="text-lg font-black uppercase tracking-widest">Trusted Neural Sources</h3>
-            </div>
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-              {article.sources.map((src, i) => (
-                <a 
-                  key={i} 
-                  href={src.url} 
-                  target="_blank" 
-                  rel="noopener noreferrer"
-                  className={`flex items-center justify-between p-4 rounded-xl border transition-all ${
-                    isDarkMode ? 'bg-white/5 border-white/10 hover:border-primary/50' : 'bg-black/5 border-black/10 hover:border-primary/30 shadow-sm'
-                  }`}
-                >
-                  <span className="text-sm font-bold uppercase tracking-tight">{src.name}</span>
-                  <ArrowUpRight size={16} className="text-primary" />
-                </a>
-              ))}
-            </div>
-          </div>
-        )}
-
         {!isLoggedIn && (
-          <div className="p-12 rounded-[3rem] bg-blue-500 border border-blue-500/20 text-center shadow-2xl glow-blue">
-            <Lock size={48} className="mx-auto mb-6 text-white" />
-            <h2 className="text-3xl font-black mb-4 uppercase">Identity Required</h2>
-            <p className="text-white/80 font-bold mb-8 max-w-sm mx-auto">This signal is encrypted. Connect your identity to decrypt the full transmission and track your interaction index.</p>
-            <button onClick={openAuth} className="px-10 py-5 rounded-2xl bg-white text-blue-500 font-black uppercase tracking-widest hover:scale-105 transition-all">Initialize Access</button>
+          <div className="absolute inset-x-0 bottom-0 top-[20%] bg-gradient-to-t from-bg-dark via-bg-dark/80 to-transparent z-20 flex flex-col items-center justify-end pb-20 px-6">
+            <div className={`p-10 rounded-2xl ${isDarkMode ? 'bg-slate-900 border-white/5 shadow-2xl' : 'bg-white shadow-3xl border-black/5'} border text-center max-w-md w-full animate-in fade-in slide-in-from-bottom-10 duration-700`}>
+              <div className="w-16 h-16 rounded-2xl bg-primary/10 text-primary flex items-center justify-center mx-auto mb-6">
+                <Lock size={32} />
+              </div>
+              <h2 className="text-2xl font-black mb-3 uppercase tracking-tight">Login to read full article</h2>
+              <p className="opacity-60 mb-8 font-medium leading-relaxed">Join the BrieflyX community to unlock unlimited access and track your reading progress across all frequencies.</p>
+              <button 
+                onClick={openAuth}
+                className="w-full py-4 rounded-xl bg-gradient-to-r from-primary to-accent text-white font-bold uppercase tracking-widest text-xs hover:scale-[1.02] active:scale-[0.98] transition-all shadow-xl"
+              >
+                Sign Up / Login
+              </button>
+            </div>
           </div>
         )}
-        
-        <CommentsSection 
-          articleId={article.id} 
-          isDarkMode={isDarkMode} 
-          user={user} 
-          openAuth={openAuth} 
-        />
       </div>
+
+      <CommentsSection 
+        articleId={article.id} 
+        isDarkMode={isDarkMode} 
+        user={user} 
+        openAuth={openAuth} 
+      />
     </motion.div>
   );
 };
@@ -1004,7 +970,7 @@ const AdminDashboard = ({ articles, users, isDarkMode, user, loadingData }: { ar
       isTrending,
       status,
       sources,
-      author: 'BrieflyX Admin',
+      author: 'Nexus Administration',
       createdAt: editing ? editing.createdAt : serverTimestamp()
     };
 
@@ -1100,27 +1066,27 @@ const AdminDashboard = ({ articles, users, isDarkMode, user, loadingData }: { ar
 
   return (
     <div className="space-y-16">
-      <header className="flex flex-col lg:flex-row justify-between items-start lg:items-end gap-12 border-b border-current opacity-10 pb-12">
+      <header className="flex flex-col lg:flex-row justify-between items-start lg:items-end gap-12 border-b border-current/10 pb-12">
         <div className="space-y-6">
           <div className="flex items-center gap-4">
             <div className="w-12 h-[2px] bg-primary glow-blue" />
-            <span className="text-[10px] font-black uppercase tracking-[0.4em]">System Role: Nexus Architect</span>
+            <span className="text-[10px] font-black uppercase tracking-[0.4em]">BrieflyX Administrator</span>
           </div>
-          <h2 className="text-6xl md:text-8xl font-black italic tracking-tighter uppercase leading-[0.8]">Neural<br /><span className="text-primary italic">Control Center.</span></h2>
+          <h2 className="text-6xl md:text-8xl font-black italic tracking-tighter uppercase leading-[0.8]">Editor<br /><span className="text-primary italic">Dashboard.</span></h2>
         </div>
         <div className="flex flex-wrap gap-4">
            <div className="flex p-1 rounded-2xl bg-current/[0.03] border border-current/10 mr-4">
               <button 
                 onClick={() => setViewMode('articles')}
-                className={`px-6 py-3 rounded-xl text-[10px] font-black uppercase tracking-widest transition-all ${viewMode === 'articles' ? 'bg-primary text-white glow-blue' : 'opacity-40 hover:opacity-100'}`}
+                className={`px-6 py-3 rounded-xl text-[10px] font-black uppercase tracking-widest transition-all ${viewMode === 'articles' ? 'bg-primary text-white glow-blue' : 'opacity-80 hover:opacity-100'}`}
               >
-                Signals
+                Articles
               </button>
               <button 
                 onClick={() => setViewMode('users')}
-                className={`px-6 py-3 rounded-xl text-[10px] font-black uppercase tracking-widest transition-all ${viewMode === 'users' ? 'bg-primary text-white glow-blue' : 'opacity-40 hover:opacity-100'}`}
+                className={`px-6 py-3 rounded-xl text-[10px] font-black uppercase tracking-widest transition-all ${viewMode === 'users' ? 'bg-primary text-white glow-blue' : 'opacity-80 hover:opacity-100'}`}
               >
-                Entities
+                Users
               </button>
            </div>
 
@@ -1132,19 +1098,19 @@ const AdminDashboard = ({ articles, users, isDarkMode, user, loadingData }: { ar
                 onClick={() => { setEditing(null); setShowAdd(true); }}
                 className="px-10 py-5 rounded-2xl bg-primary text-white font-black uppercase tracking-widest text-[10px] glow-blue shadow-2xl flex items-center gap-3"
               >
-                <Plus size={18} /> Initialize New Signal
+                <Plus size={18} /> New Article
               </motion.button>
               <button 
                 onClick={handleSimulatePulse}
                 className={`p-5 rounded-2xl border transition-all ${isDarkMode ? 'bg-white/5 border-white/10 opacity-40 hover:opacity-100' : 'bg-black/5 border-black/10 opacity-40 hover:opacity-100'}`}
-                title="Inject Mock Pulse"
+                title="Add Sample Data"
               >
                 <Activity size={20} />
               </button>
               <button 
                 onClick={handleReset}
                 className="p-5 rounded-2xl bg-red-500/10 text-red-500 border border-red-500/20 opacity-40 hover:opacity-100 transition-all"
-                title="Purge Baseline"
+                title="Reset Database"
               >
                 <Zap size={20} />
               </button>
@@ -1285,9 +1251,9 @@ const AdminDashboard = ({ articles, users, isDarkMode, user, loadingData }: { ar
               
               <div className="mt-8 flex items-center justify-between gap-4 relative z-10">
                 <div className="flex flex-col">
-                   <span className="text-[8px] font-black uppercase tracking-widest opacity-40 italic">Neural Auth Level</span>
+                   <span className="text-[8px] font-black uppercase tracking-widest opacity-80 italic">Neural Auth Level</span>
                    <span className={`text-[10px] font-black uppercase tracking-widest italic ${u.isAdmin ? 'text-primary glow-blue' : 'opacity-60'}`}>
-                     {u.isAdmin ? 'Nexus Architect' : 'Standard Node'}
+                     {u.isAdmin ? 'Administrator' : 'User'}
                    </span>
                 </div>
                 
@@ -1314,7 +1280,7 @@ const AdminDashboard = ({ articles, users, isDarkMode, user, loadingData }: { ar
           <InputField label="Article Title" value={title} onChange={setTitle} isDarkMode={isDarkMode} required />
           <InputField label="Summary" value={summary} onChange={setSummary} isDarkMode={isDarkMode} required />
           <div className="space-y-2">
-            <label className="text-[10px] font-black uppercase tracking-widest opacity-40 ml-4">Neural Content</label>
+            <label className="text-[10px] font-bold uppercase tracking-widest opacity-40 ml-4">Article Content</label>
             <textarea
               required
               value={content}
@@ -1326,7 +1292,7 @@ const AdminDashboard = ({ articles, users, isDarkMode, user, loadingData }: { ar
             />
           </div>
           <div className="space-y-2">
-            <label className="text-[10px] font-black uppercase tracking-widest opacity-40 ml-4">Signal Frequency (Category)</label>
+            <label className="text-[10px] font-black uppercase tracking-widest opacity-80 ml-4">Signal Frequency (Category)</label>
             <select
               value={category}
               onChange={(e) => setCategory(e.target.value as Category)}
@@ -1366,7 +1332,7 @@ const AdminDashboard = ({ articles, users, isDarkMode, user, loadingData }: { ar
 
           <div className="space-y-4 p-6 rounded-2xl bg-white/5 border border-white/10">
             <div className="flex justify-between items-center">
-              <label className="text-[10px] font-black uppercase tracking-widest opacity-40">Trusted Sources</label>
+              <label className="text-[10px] font-black uppercase tracking-widest opacity-80">Trusted Sources</label>
               <button 
                 type="button" 
                 onClick={() => setSources([...sources, { name: '', url: '' }])}
@@ -1469,39 +1435,39 @@ const AuthModal = ({ isOpen, onClose, isDarkMode }: { isOpen: boolean, onClose: 
             initial={{ opacity: 0, scale: 0.9, y: 30 }}
             animate={{ opacity: 1, scale: 1, y: 0 }}
             exit={{ opacity: 0, scale: 0.9, y: 30 }}
-            className={`relative w-full max-w-lg p-10 rounded-[3rem] border shadow-[0_0_50px_rgba(59,130,246,0.2)] bg-black border-white/10 text-white overflow-hidden`}
+            className={`relative w-full max-w-lg p-10 rounded-2xl border shadow-2xl ${isDarkMode ? 'bg-card-dark border-white/10 text-white' : 'bg-card-light border-black/10 text-slate-900'} overflow-hidden`}
           >
             <div className="absolute top-0 right-0 w-64 h-64 bg-blue-500/10 blur-[100px] -mr-32 -mt-32 rounded-full" />
             
             <div className="text-center mb-10">
-              <div className="w-20 h-20 rounded-3xl bg-gradient-to-br from-blue-500 to-purple-600 flex items-center justify-center text-white mx-auto mb-6 shadow-2xl glow-blue transform rotate-12">
-                <Newspaper size={40} className="-rotate-12" />
+              <div className="w-16 h-16 rounded-2xl bg-gradient-to-br from-primary to-accent flex items-center justify-center text-white mx-auto mb-6 shadow-xl transition-transform hover:rotate-3">
+                <Newspaper size={32} />
               </div>
-              <h2 className="text-4xl font-black tracking-tighter mb-2 uppercase">
-                {view === 'login' ? 'Nexus Login' : 'Identity Creation'}
+              <h2 className="text-3xl font-black tracking-tight mb-2 uppercase">
+                {view === 'login' ? 'Welcome Back' : 'Create Account'}
               </h2>
-              <p className="text-[10px] opacity-50 font-black tracking-[0.3em] uppercase">BrieflyX Access Protocol</p>
+              <p className="text-[10px] opacity-40 font-bold tracking-[0.2em] uppercase">BrieflyX Secure Access Protocol</p>
             </div>
 
             <div className="space-y-6">
               <button
                 onClick={handleGoogleLogin}
                 disabled={loading}
-                className="w-full py-4 rounded-2xl flex items-center justify-center gap-3 font-bold border border-white/10 bg-white/5 hover:bg-white/10 transition-all"
+                className="w-full py-4 rounded-xl flex items-center justify-center gap-3 font-bold border border-white/10 bg-white/5 hover:bg-white/10 transition-all text-sm"
               >
                 <img src="https://www.gstatic.com/firebasejs/ui/2.0.0/images/auth/google.svg" alt="Google" className="w-5 h-5" />
-                Synchronize via Google
+                Continue with Google
               </button>
 
-              <div className="flex items-center gap-4 opacity-20">
+              <div className="flex items-center gap-4 opacity-10">
                 <div className="h-px flex-1 bg-current" />
                 <span className="text-[10px] font-bold uppercase tracking-widest">OR</span>
                 <div className="h-px flex-1 bg-current" />
               </div>
 
               <form onSubmit={handleSubmit} className="space-y-4">
-                <InputField label="Nexus Email" type="email" placeholder="user@brieflyx.future" value={email} onChange={setEmail} isDarkMode={true} required />
-                <InputField label="Neural Key" type="password" placeholder="••••••••" value={password} onChange={setPassword} isDarkMode={true} required />
+                <InputField label="Email Address" type="email" placeholder="you@example.com" value={email} onChange={setEmail} isDarkMode={true} required />
+                <InputField label="Password" type="password" placeholder="••••••••" value={password} onChange={setPassword} isDarkMode={true} required />
 
                 {error && <p className="text-red-500 text-xs font-bold text-center">{error}</p>}
 
@@ -1538,7 +1504,7 @@ const Modal = ({ isOpen, onClose, isDarkMode, title, children }: any) => {
       <motion.div 
         initial={{ opacity: 0, scale: 0.9 }} 
         animate={{ opacity: 1, scale: 1 }} 
-        className={`relative w-full max-w-md p-8 rounded-[3rem] border overflow-hidden ${isDarkMode ? 'bg-black border-white/10 text-white' : 'bg-white border-black/10 text-black shadow-2xl'}`}
+        className={`relative w-full max-w-md p-8 rounded-2xl border overflow-hidden ${isDarkMode ? 'bg-card-dark border-white/5 text-white' : 'bg-card-light border-black/5 text-black shadow-2xl'}`}
       >
         <div className="flex justify-between items-center mb-6">
           <h2 className="text-2xl font-black uppercase tracking-tighter">{title}</h2>
@@ -1646,7 +1612,7 @@ const ChatWidget = ({ article, isDarkMode, user, dailyStats }: { article: Articl
 
             <div className="flex-1 overflow-y-auto p-6 space-y-4 scrollbar-hide">
               {messages.length === 0 && (
-                <div className="h-full flex flex-col items-center justify-center text-center space-y-4 opacity-30">
+                <div className="h-full flex flex-col items-center justify-center text-center space-y-4 opacity-80">
                   <MessageSquare size={48} />
                   <p className="text-[10px] font-black uppercase tracking-widest">System Ready.<br/>What are your inquiries about this transmission?</p>
                 </div>
@@ -1992,63 +1958,92 @@ export default function App() {
     const latest = approvedArticles.filter(a => !a.isTrending).slice(0, 6);
 
     return (
-      <div className="space-y-32">
-        {/* Hero Section */}
-        <section className="relative py-20 overflow-hidden">
-          <div className="relative z-10 text-center space-y-8">
-            <motion.div
-              initial={{ opacity: 0, scale: 0.9 }}
-              animate={{ opacity: 1, scale: 1 }}
-              whileHover={{ scale: 1.1, rotate: 2 }}
-              className="inline-block px-6 py-2 rounded-full bg-primary/10 text-[10px] font-black uppercase tracking-[0.4em] text-primary mb-4 border border-primary/20 glow-blue transition-all cursor-default"
-            >
-              Neural Nexus Established
-            </motion.div>
-            <motion.h1 
-              initial={{ opacity: 0, y: 50 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ delay: 0.1 }}
-              className="text-[12vw] lg:text-[10vw] font-black uppercase tracking-tighter italic leading-[0.8] mix-blend-difference"
-            >
-              Neural<br /><span className="text-primary italic">Nexus.</span>
-            </motion.h1>
-            <motion.p 
-              initial={{ opacity: 0 }}
-              animate={{ opacity: 1 }}
-              transition={{ delay: 0.3 }}
-              className="text-sm md:text-xl font-medium opacity-50 leading-relaxed italic max-w-xl mx-auto"
-            >
-              Synthesizing global signal streams into high-fidelity neural summaries. Access the future, zero latency.
-            </motion.p>
-            <div className="flex justify-center gap-6 pt-12">
-              <motion.button 
-                whileHover={{ scale: 1.05, y: -5 }}
-                whileTap={{ scale: 0.95 }}
-                onClick={() => setActiveView('feed')}
-                className="px-10 py-5 rounded-2xl bg-gradient-to-r from-primary to-accent text-white font-black uppercase tracking-widest glow-blue shadow-2xl"
+      <div className="space-y-40">
+        <section className="min-h-[70vh] flex flex-col justify-center relative">
+          <div className="relative z-10 space-y-12 max-w-4xl">
+            <div className="space-y-6">
+              <motion.div 
+                initial={{ opacity: 0, x: -20 }}
+                animate={{ opacity: 1, x: 0 }}
+                className="flex items-center gap-3"
               >
-                Initialize Feed
-              </motion.button>
-              <motion.button 
-                whileHover={{ scale: 1.05, y: -5 }}
-                whileTap={{ scale: 0.95 }}
-                onClick={() => setActiveView('about')}
-                className={`px-10 py-5 rounded-2xl border font-black uppercase tracking-widest transition-all ${isDarkMode ? 'border-white/10 hover:bg-white/5' : 'border-black/10 hover:bg-black/5'}`}
+                <div className="h-[2px] w-8 bg-primary" />
+                <span className={`text-[10px] font-bold uppercase tracking-[0.4em] ${isDarkMode ? 'text-primary' : 'text-slate-900'}`}>The Future of News // v1.0</span>
+              </motion.div>
+              
+              <div className="space-y-4">
+                <motion.h1 
+                  initial={{ opacity: 0, y: 40 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  transition={{ duration: 0.8, ease: [0.22, 1, 0.36, 1] }}
+                  className={`text-6xl lg:text-8xl font-black tracking-tight leading-[1] ${isDarkMode ? 'text-white' : 'text-slate-950'}`}
+                >
+                  Minimal. <br /><span className="text-transparent bg-clip-text bg-gradient-to-r from-primary to-accent">Futuristic. News.</span>
+                </motion.h1>
+              </div>
+
+              <motion.p 
+                initial={{ opacity: 0 }}
+                animate={{ opacity: 0.6 }}
+                transition={{ delay: 0.5 }}
+                className={`text-xl font-medium leading-relaxed max-w-2xl ${isDarkMode ? 'text-white' : 'text-slate-900'}`}
               >
-                Join Protocol
-              </motion.button>
+                Stay ahead with BrieflyX. We synthesize complex global updates into clean, essential insights for the next generation of thinkers.
+              </motion.p>
             </div>
+
+            <motion.div 
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ delay: 0.7 }}
+              className="flex flex-wrap gap-4"
+            >
+              <button 
+                onClick={() => setActiveView('feed')}
+                className="px-10 py-5 rounded-2xl bg-gradient-to-r from-primary to-accent text-white font-bold uppercase tracking-widest text-[11px] hover:scale-[1.05] active:scale-95 transition-all flex items-center gap-3 shadow-xl"
+              >
+                View Feed
+                <ArrowRight size={18} />
+              </button>
+              <button 
+                onClick={() => setActiveView('about')}
+                className={`px-10 py-5 rounded-2xl border border-current font-bold uppercase tracking-widest text-[11px] transition-all ${isDarkMode ? 'text-white border-white/20 hover:bg-white/5' : 'text-slate-900 border-slate-200 hover:bg-slate-50'}`}
+              >
+                Our Story
+              </button>
+            </motion.div>
           </div>
+        </section>
+        
+        <section className="grid grid-cols-1 md:grid-cols-3 gap-8">
+          <DetailCard 
+            icon={<Cpu size={24} />} 
+            title="Smart Synthesis" 
+            desc="AI-driven analysis that finds the core of every story instantly."
+            isDarkMode={isDarkMode}
+          />
+          <DetailCard 
+            icon={<ShieldCheck size={24} />} 
+            title="Verified Truth" 
+            desc="Exhaustive cross-referencing protocols to eliminate misinformation."
+            isDarkMode={isDarkMode}
+          />
+          <DetailCard 
+            icon={<Globe size={24} />} 
+            title="Global Reach" 
+            desc="Connecting signals from across the planet on a single unified grid."
+            isDarkMode={isDarkMode}
+          />
         </section>
 
         <section className="space-y-16">
-          <div className="flex flex-col md:flex-row md:items-end justify-between gap-8 border-b border-current opacity-10 pb-8">
+          <div className="flex flex-col md:flex-row md:items-end justify-between gap-8 border-b border-current/10 pb-10">
             <div className="space-y-2">
-              <h2 className="text-4xl font-black uppercase tracking-tighter italic">Trending Flux</h2>
-              <p className="text-[10px] font-black uppercase tracking-[0.4em]">Status: Real-time Signal Processing</p>
+              <h2 className="text-4xl font-bold tracking-tight">Top Stories</h2>
+              <p className={`text-[10px] font-bold uppercase tracking-[0.4em] ${isDarkMode ? 'text-white/40' : 'text-slate-400'}`}>Currently trending across the network</p>
             </div>
             <div className="flex gap-2">
-              <div className="px-3 py-1 rounded bg-primary/10 border border-primary/20 text-primary text-[8px] font-black uppercase tracking-widest animate-pulse">Live Uplink</div>
+              <span className="px-3 py-1 rounded-full bg-primary/10 border border-primary/20 text-primary text-[8px] font-bold uppercase tracking-widest animate-pulse">Live Updates</span>
             </div>
           </div>
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8">
@@ -2058,39 +2053,41 @@ export default function App() {
               trending.map(art => (
                 <motion.div 
                   key={art.id}
-                  whileHover={{ scale: 1.05, y: -10, boxShadow: '0 20px 40px rgba(0,0,0,0.2)' }}
+                  whileHover={{ y: -8 }}
                   onClick={() => { setSelectedArticle(art); setActiveView('article'); }}
-                  className={`p-6 rounded-3xl border cursor-pointer transition-all ${
-                    isDarkMode ? 'bg-card-dark/40 border-white/5 hover:border-primary/30' : 'bg-white border-black/5 hover:border-primary/20 shadow-sm'
+                  className={`p-8 rounded-2xl border cursor-pointer transition-all duration-300 group relative overflow-hidden flex flex-col justify-between aspect-square ${
+                    isDarkMode ? 'bg-card-dark border-white/5 hover:border-primary/40' : 'bg-card-light border-black/5 hover:border-primary/20 shadow-xl'
                   }`}
                 >
-                  <div className="flex flex-col h-full justify-between">
-                    <div>
-                      <span className="text-primary text-[8px] font-black uppercase tracking-[0.2em] mb-2 inline-block italic">{art.category}</span>
-                      <h4 className="text-lg font-black uppercase leading-tight tracking-tight mb-4 line-clamp-3">{art.title}</h4>
-                    </div>
-                    <div className="flex items-center justify-between pt-4 border-t border-current opacity-10">
-                      <span className="text-[8px] font-black uppercase tracking-widest">{art.author}</span>
-                      <ArrowUpRight size={14} className="text-primary" />
-                    </div>
+                  <div className="relative z-10">
+                    <span className="text-[9px] font-bold uppercase tracking-widest px-2 py-1 rounded-lg bg-primary/10 text-primary border border-primary/20 mb-6 inline-block">
+                      {art.category}
+                    </span>
+                    <h3 className={`text-xl font-bold leading-tight tracking-tight mb-4 group-hover:text-primary transition-colors line-clamp-3 ${isDarkMode ? 'text-white' : 'text-slate-950'}`}>
+                      {art.title}
+                    </h3>
+                  </div>
+                  <div className="relative z-10 pt-6 border-t border-current/5 flex items-center justify-between">
+                    <span className="text-[10px] font-bold uppercase tracking-widest opacity-40">{art.author}</span>
+                    <ArrowUpRight size={16} className={`transition-all ${isDarkMode ? 'text-white' : 'text-slate-400'} group-hover:text-primary group-hover:translate-x-1 group-hover:-translate-y-1`} />
                   </div>
                 </motion.div>
               ))
             ) : (
-              <div className="col-span-full py-12 text-center opacity-30 text-[10px] font-black uppercase tracking-[0.5em]">Synchronizing Trending Signals...</div>
+              <div className="col-span-full py-12 text-center opacity-40 text-[10px] font-bold uppercase tracking-widest">Searching for signals...</div>
             )}
           </div>
         </section>
 
-        {/* Featured Grid */}
-        <section className="space-y-12">
-          <div className="flex flex-col md:flex-row md:items-end justify-between gap-8 border-b border-current opacity-10 pb-8">
-            <div className="space-y-2 text-left">
-              <h2 className="text-5xl font-black uppercase tracking-tighter italic leading-none">Latest<br/><span className="text-primary italic">Transmissions.</span></h2>
-              <p className="text-[10px] font-black uppercase tracking-[0.4em]">System Status: Real-time Uplink Ready</p>
+        <section className="space-y-16">
+          <div className="flex flex-col md:flex-row md:items-end justify-between gap-8 border-b border-current/10 pb-10">
+            <div className="space-y-2">
+              <h2 className="text-4xl font-bold tracking-tight">Latest News</h2>
+              <p className={`text-[10px] font-bold uppercase tracking-[0.4em] ${isDarkMode ? 'text-white/40' : 'text-slate-400'}`}>The freshest insights from around the globe</p>
             </div>
-            <button onClick={() => setActiveView('feed')} className="px-8 py-3.5 rounded-2xl border border-current opacity-20 hover:opacity-100 hover:text-primary hover:border-primary transition-all text-[10px] font-black uppercase tracking-widest">
-              Access Full Archive +
+            <button onClick={() => setActiveView('feed')} className={`px-10 py-4 rounded-2xl border font-bold uppercase tracking-widest text-[10px] transition-all group flex items-center gap-4 ${isDarkMode ? 'bg-white/5 border-white/10 hover:bg-white/10' : 'bg-slate-100 border-slate-200 hover:bg-slate-200'}`}>
+              Explore More
+              <ArrowRight size={16} className="group-hover:translate-x-1 transition-transform" />
             </button>
           </div>
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-x-8 gap-y-16">
@@ -2134,33 +2131,33 @@ export default function App() {
 
     return (
       <div className="space-y-16">
-        <header className="flex flex-col lg:flex-row justify-between items-start lg:items-end gap-12 border-b border-current opacity-10 pb-12">
+        <header className="flex flex-col lg:flex-row justify-between items-start lg:items-end gap-12 border-b border-current/10 pb-12">
           <div className="space-y-6">
-            <div className="flex items-center gap-4">
-              <div className="w-12 h-[px] bg-primary glow-blue" />
-              <span className="text-[10px] font-black uppercase tracking-[0.4em]">Frequency: Broad-Spectrum</span>
+            <div className="flex items-center gap-3">
+              <div className="w-8 h-[2px] bg-primary" />
+              <span className="text-[10px] font-bold uppercase tracking-[0.4em] opacity-40">Frequency: Broad-Spectrum</span>
             </div>
-            <h2 className="text-6xl md:text-8xl font-black italic tracking-tighter uppercase leading-[0.8] mb-4">Nexus<br /><span className="text-primary italic">Signal Feed.</span></h2>
+            <h2 className="text-6xl md:text-8xl font-black tracking-tight uppercase leading-[0.8]">News<br /><span className="text-primary">Feed.</span></h2>
           </div>
           <div className="flex flex-wrap gap-2">
             <button
               onClick={() => setFeedFilter('All')}
-              className={`px-8 py-3.5 rounded-2xl text-[10px] font-black uppercase tracking-widest transition-all border ${
+              className={`px-8 py-3.5 rounded-xl text-[10px] font-bold uppercase tracking-widest transition-all border ${
                 feedFilter === 'All'
-                  ? 'bg-primary border-primary text-white glow-blue shadow-xl'
-                  : isDarkMode ? 'bg-white/5 border-white/5 opacity-40 hover:opacity-100' : 'bg-black/5 border-black/5 opacity-40 hover:opacity-100'
+                  ? 'bg-primary border-primary text-white shadow-lg'
+                  : isDarkMode ? 'bg-white/5 border-white/5 opacity-40 hover:opacity-100 hover:bg-white/10' : 'bg-black/5 border-black/5 opacity-40 hover:opacity-100 hover:bg-black/10'
               }`}
             >
-              Master Stream
+              All Signals
             </button>
             {CATEGORIES.map(cat => (
               <button
                 key={cat}
                 onClick={() => setFeedFilter(cat)}
-                className={`px-8 py-3.5 rounded-2xl text-[10px] font-black uppercase tracking-widest transition-all border ${
+                className={`px-8 py-3.5 rounded-xl text-[10px] font-bold uppercase tracking-widest transition-all border ${
                   feedFilter === cat
-                    ? 'bg-primary border-primary text-white glow-blue shadow-xl'
-                    : isDarkMode ? 'bg-white/5 border-white/5 opacity-40 hover:opacity-100 hover:text-primary hover:border-primary' : 'bg-black/5 border-black/5 opacity-40 hover:opacity-100 hover:text-primary hover:border-primary'
+                    ? 'bg-primary border-primary text-white shadow-lg'
+                    : isDarkMode ? 'bg-white/5 border-white/5 opacity-40 hover:opacity-100 hover:bg-white/10' : 'bg-black/5 border-black/5 opacity-40 hover:opacity-100 hover:bg-black/10'
                 }`}
               >
                 {cat}
@@ -2168,12 +2165,6 @@ export default function App() {
             ))}
           </div>
         </header>
-
-        {preferredCats.length > 0 && (
-          <div className="flex items-center gap-2 px-4 py-2 rounded-full bg-blue-500/10 border border-blue-500/20 w-fit">
-            <span className="text-[8px] font-black uppercase tracking-widest text-blue-500">Filtered by Neural Preferences: {preferredCats.join(', ')}</span>
-          </div>
-        )}
 
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-x-8 gap-y-16">
           {loadingData ? (
@@ -2351,75 +2342,85 @@ export default function App() {
   );
 
   const renderAbout = () => (
-    <div className="max-w-4xl mx-auto space-y-12">
+    <div className="max-w-5xl mx-auto space-y-20">
       <header className="text-center space-y-4">
-        <h2 className="text-6xl font-black italic tracking-tighter uppercase">About BrieflyX.</h2>
-        <p className="text-sm font-black tracking-[0.4em] uppercase">The Future of Information Synthesis</p>
+        <h2 className="text-6xl md:text-8xl font-black tracking-tight leading-none">Briefly<span className="text-primary italic">X.</span></h2>
+        <p className="text-sm font-bold tracking-[0.4em] uppercase opacity-40">Modern Insights for the Global Citizen</p>
       </header>
-      <div className={`p-8 md:p-12 rounded-[2rem] border ${isDarkMode ? 'bg-card-dark/40 border-white/5' : 'bg-card-light/40 border-black/5'} space-y-6 text-lg leading-relaxed backdrop-blur-xl shadow-2xl`}>
-        <p>BrieflyX was born from the necessity of clarity in an era of information overload. We don't just report news; we synthesize the frequencies of the future into digestible neural signals.</p>
-        <p>Our mission is to empower the global citizen with hyper-relevant insights across technology, science, and culture, using advanced filtering protocols to ensure you only receive the data that matters to your evolution.</p>
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-8 pt-8">
-          <div className="space-y-2">
-            <h4 className="font-black text-primary uppercase tracking-widest text-xs">Integrity</h4>
-            <p className="text-sm opacity-60">Pure signals, zero interference from corporate bias.</p>
+      
+      <div className="grid grid-cols-1 lg:grid-cols-2 gap-16 items-center">
+        <div className="space-y-6">
+          <h3 className="text-3xl font-bold tracking-tight">The Future of News.</h3>
+          <p className={`text-lg leading-relaxed font-medium ${isDarkMode ? 'text-white/60' : 'text-slate-600'}`}>
+            In an era defined by noise, BrieflyX delivers signal. We leverage advanced synthesis to provide hyper-relevant news across tech, science, and world events.
+          </p>
+          <div className="flex gap-12 pt-4">
+            <div className="space-y-1">
+              <span className="text-2xl font-black text-primary">100k+</span>
+              <p className="text-[10px] font-bold uppercase tracking-widest opacity-40">Readers</p>
+            </div>
+            <div className="space-y-1">
+              <span className="text-2xl font-black text-primary">Global</span>
+              <p className="text-[10px] font-bold uppercase tracking-widest opacity-40">Network</p>
+            </div>
           </div>
-          <div className="space-y-2">
-            <h4 className="font-black text-primary uppercase tracking-widest text-xs">Velocity</h4>
-            <p className="text-sm opacity-60">Real-time synthesis of emerging trends.</p>
-          </div>
-          <div className="space-y-2">
-            <h4 className="font-black text-primary uppercase tracking-widest text-xs">Evolution</h4>
-            <p className="text-sm opacity-60">Evolving our platform with the speed of thought.</p>
-          </div>
+        </div>
+        <div className={`p-8 rounded-2xl border ${isDarkMode ? 'bg-card-dark border-white/5' : 'bg-card-light border-black/5 shadow-xl'}`}>
+           <div className="aspect-square rounded-xl overflow-hidden bg-primary/5 flex items-center justify-center">
+              <Newspaper size={80} className="text-primary opacity-20" />
+           </div>
         </div>
       </div>
     </div>
   );
 
   const renderContact = () => (
-    <div className="max-w-xl mx-auto space-y-12">
+    <div className="max-w-2xl mx-auto space-y-12">
       <header className="text-center space-y-4">
-        <h2 className="text-6xl font-black italic tracking-tighter uppercase">Contact.</h2>
-        <p className="text-sm font-black tracking-[0.4em] uppercase">Establish neural link</p>
+        <h2 className="text-6xl md:text-7xl font-black tracking-tight leading-none">Contact.</h2>
+        <p className="text-sm font-bold tracking-[0.4em] uppercase opacity-40">We'd love to hear from you</p>
       </header>
-      <div className={`p-8 rounded-[3rem] border ${isDarkMode ? 'bg-card-dark/40 border-white/5' : 'bg-card-light/40 border-black/5'} backdrop-blur-xl shadow-2xl`}>
-        <form className="space-y-6" onSubmit={(e) => { e.preventDefault(); alert("Signal transmitted."); }}>
-          <InputField label="Identity Name" placeholder="Futurist-01" isDarkMode={isDarkMode} />
-          <InputField label="Neural Email" placeholder="nexus@brieflyx.future" isDarkMode={isDarkMode} />
+
+      <div className={`p-10 rounded-2xl border ${isDarkMode ? 'bg-card-dark border-white/5' : 'bg-card-light border-black/5 shadow-xl'}`}>
+        <form className="space-y-6" onSubmit={(e) => { e.preventDefault(); alert("Message sent successfully."); }}>
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+            <InputField label="Name" placeholder="John Doe" isDarkMode={isDarkMode} />
+            <InputField label="Email" placeholder="john@example.com" isDarkMode={isDarkMode} />
+          </div>
+          
           <div className="space-y-2">
-            <label className="text-[10px] font-black uppercase tracking-widest ml-4">Transmission Content</label>
+            <label className="text-[10px] font-bold uppercase tracking-widest ml-4 opacity-40">Message</label>
             <textarea 
-              className={`w-full px-6 py-4 rounded-2xl outline-none transition-all font-medium h-32 ${isDarkMode ? 'bg-white/5 border-white/10 focus:border-primary text-white' : 'bg-black/5 border-black/10 focus:border-primary text-black'}`}
-              placeholder="What frequency are you broadcasting?"
+              className={`w-full px-6 py-4 rounded-xl outline-none transition-all font-medium h-32 resize-none ${
+                isDarkMode 
+                  ? 'bg-white/5 border border-white/5 focus:border-primary text-white' 
+                  : 'bg-black/[0.02] border border-black/5 focus:border-primary text-black'
+              }`}
+              placeholder="Tell us what's on your mind..."
             />
           </div>
-          <ActionButton label="Transmit Signal" />
+          
+          <button className="w-full py-4 rounded-xl bg-primary text-white font-bold uppercase tracking-widest hover:scale-[1.02] active:scale-[0.98] transition-all shadow-lg flex items-center justify-center gap-3">
+            Send Message
+            <Send size={16} />
+          </button>
         </form>
+      </div>
+
+      <div className="flex justify-center gap-10 opacity-30">
+        <Twitter className="hover:text-primary transition-colors cursor-pointer" size={20} />
+        <Github className="hover:text-primary transition-colors cursor-pointer" size={20} />
+        <Instagram className="hover:text-primary transition-colors cursor-pointer" size={20} />
       </div>
     </div>
   );
 
   return (
-    <div className={`min-h-screen transition-colors duration-1000 ${isDarkMode ? 'bg-bg-dark text-text-dark' : 'bg-bg-light text-text-light'} font-sans selection:bg-primary selection:text-white relative`}>
-      {/* Dynamic Background Atmosphere */}
-      <div className="fixed inset-0 pointer-events-none z-[-1] overflow-hidden">
-        {/* Radial Background Orbs (Low Opacity Glow) */}
-        <div className={`absolute top-[-10%] left-[-10%] w-[70vw] h-[70vw] rounded-full blur-[120px] animate-float delay-1000 opacity-[0.07] ${isDarkMode ? 'bg-primary' : 'bg-primary/20'}`} />
-        <div className={`absolute bottom-[-10%] right-[-10%] w-[60vw] h-[60vw] rounded-full blur-[140px] animate-float opacity-[0.07] ${isDarkMode ? 'bg-accent' : 'bg-accent/20'}`} />
-        
-        {/* Subtle Grid / Overlay Lines */}
-        <div className={`absolute inset-0 transition-opacity duration-1000 ${isDarkMode ? 'grid-pattern opacity-30 px-20' : 'grid-pattern-light opacity-[0.03]'}`} />
-        
-        {/* Noise Texture */}
-        <div className="absolute inset-0 opacity-[0.03] pointer-events-none bg-[url('https://grainy-gradients.vercel.app/noise.svg')]" />
-        
-        {/* Scanline Effect */}
-        <div className="scanline fixed top-0 left-0 z-50 opacity-20" />
-        
-        <ExchangeTicker isDarkMode={isDarkMode} />
+    <div className={`min-h-screen transition-colors duration-1000 ${isDarkMode ? 'bg-bg-dark text-text-dark' : 'bg-bg-light text-text-light'} font-sans selection:bg-primary selection:text-white relative overflow-x-hidden`}>
+      <div className="fixed inset-0 pointer-events-none z-0 overflow-hidden opacity-30">
+        <div className={`absolute top-[-10%] right-[-10%] w-[40vw] h-[40vw] rounded-full blur-[120px] ${isDarkMode ? 'bg-primary/10' : 'bg-primary/5'}`} />
+        <div className={`absolute bottom-[-10%] left-[-10%] w-[30vw] h-[30vw] rounded-full blur-[120px] ${isDarkMode ? 'bg-accent/10' : 'bg-accent/5'}`} />
       </div>
-
       <Navbar 
         isDarkMode={isDarkMode} 
         toggleTheme={() => setIsDarkMode(!isDarkMode)} 
@@ -2433,7 +2434,7 @@ export default function App() {
       />
       <AuthModal isOpen={showAuthModal} onClose={() => setShowAuthModal(false)} isDarkMode={isDarkMode} />
       
-      <main className="pt-48 pb-40 max-w-7xl mx-auto px-6 md:px-12 relative z-10">
+      <main className="pt-32 pb-40 max-w-7xl mx-auto px-6 md:px-12 relative z-10">
         <AnimatePresence mode="wait">
           <motion.div
             key={activeView + (selectedArticle?.id || '')}
@@ -2461,12 +2462,12 @@ export default function App() {
                 <AdminDashboard articles={articles} users={allUsers} isDarkMode={isDarkMode} user={user!} loadingData={loadingData} />
               ) : (
                 <div className="text-center py-40 space-y-8">
-                  <div className="w-24 h-24 rounded-full bg-red-500/10 flex items-center justify-center text-red-500 mx-auto">
-                    <ShieldAlert size={48} />
+                  <div className="w-20 h-20 rounded-full bg-red-500/10 flex items-center justify-center text-red-500 mx-auto">
+                    <ShieldAlert size={32} />
                   </div>
-                  <h2 className="text-4xl font-black uppercase italic italic tracking-tighter">Access Denied.</h2>
-                  <p className="opacity-40 max-w-md mx-auto">Your neural signature does not possess the required clearance level for this sector.</p>
-                  <button onClick={() => setActiveView('home')} className="px-10 py-4 rounded-2xl border border-current opacity-20 hover:opacity-100 transition-all text-xs font-black uppercase tracking-widest">Return to Nexus</button>
+                  <h2 className="text-4xl font-bold tracking-tight">Access Denied</h2>
+                  <p className="opacity-40 max-w-md mx-auto">You do not have the required permissions to access the BrieflyX administration hub.</p>
+                  <button onClick={() => setActiveView('home')} className="px-10 py-4 rounded-xl border border-current font-bold uppercase tracking-widest text-[10px] hover:bg-current hover:text-bg-dark transition-all">Return to Dashboard</button>
                 </div>
               )
             )}

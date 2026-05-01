@@ -3,100 +3,103 @@
 
 @theme {
   --color-primary: #2563EB;
+  --color-primary-dark: #1E40AF;
   --color-accent: #7C3AED;
-  --color-bg-dark: #0F172A;
+  --color-accent-dark: #5B21B6;
+  --color-success: #10B981;
+  --color-warning: #F59E0B;
+  --color-danger: #EF4444;
+  
+  --color-bg-dark: #111827;
   --color-bg-light: #FFFFFF;
-  --color-card-dark: #111827;
+  --color-card-dark: #1F2937;
   --color-card-light: #F3F4F6;
-  --color-text-dark: #E5E7EB;
+  --color-text-dark: #F9FAFB;
   --color-text-light: #111827;
+  
   --font-sans: "Inter", ui-sans-serif, system-ui, sans-serif;
   
-  --animate-scanline: scanline 12s linear infinite;
-  --animate-float: float 15s ease-in-out infinite;
+  --animate-scanline: scanline 8s linear infinite;
+  --animate-float: float 12s ease-in-out infinite;
+  --animate-pulse-slow: pulse 4s cubic-bezier(0.4, 0, 0.6, 1) infinite;
 
   @keyframes scanline {
-    0% { transform: translateY(-100%); }
-    100% { transform: translateY(100vh); }
+    0% { transform: translateY(-100%); opacity: 0; }
+    5% { opacity: 0.5; }
+    95% { opacity: 0.5; }
+    100% { transform: translateY(100vh); opacity: 0; }
   }
 
   @keyframes float {
-    0%, 100% { transform: translate(0, 0) scale(1); }
-    33% { transform: translate(2%, 4%) scale(1.05); }
-    66% { transform: translate(-2%, 2%) scale(0.95); }
+    0%, 100% { transform: translate(0, 0) rotate(0deg); }
+    33% { transform: translate(1%, 2%) rotate(0.5deg); }
+    66% { transform: translate(-1%, 1%) rotate(-0.5deg); }
   }
 }
 
 @layer base {
   body {
-    @apply font-sans transition-colors duration-500 overflow-x-hidden;
+    @apply font-sans transition-colors duration-700 overflow-x-hidden antialiased;
+    background-attachment: fixed;
   }
 }
 
 @layer utilities {
   .glass {
-    @apply backdrop-blur-xl bg-white/70 border border-black/5;
+    @apply backdrop-blur-xl bg-white/80 border border-black/10 shadow-[0_8px_32px_0_rgba(31,38,135,0.07)];
   }
   
   .glass-dark {
-    @apply backdrop-blur-2xl bg-black/40 border border-white/5;
+    @apply backdrop-blur-2xl bg-slate-950/60 border border-white/10 shadow-[0_8px_32px_0_rgba(0,0,0,0.8)];
+  }
+
+  .neon-border {
+    @apply border-primary/30 hover:border-primary/60 transition-colors duration-300;
+    box-shadow: inset 0 0 10px rgba(59, 130, 246, 0.1);
   }
 
   .glow-blue {
-    box-shadow: 0 0 25px rgba(37, 99, 235, 0.25);
+    box-shadow: 0 0 30px -5px rgba(59, 130, 246, 0.3);
   }
 
   .glow-purple {
-    box-shadow: 0 0 25px rgba(124, 58, 237, 0.25);
-  }
-
-  .glow-green {
-    box-shadow: 0 0 25px rgba(34, 197, 94, 0.25);
-  }
-
-  .glow-red {
-    box-shadow: 0 0 25px rgba(239, 68, 68, 0.25);
+    box-shadow: 0 0 30px -5px rgba(139, 92, 246, 0.3);
   }
 
   .text-glow-blue {
-    text-shadow: 0 0 15px rgba(37, 99, 235, 0.5);
+    text-shadow: 0 0 10px rgba(59, 130, 246, 0.4);
   }
 
   .scanline {
     width: 100%;
-    height: 4px;
-    background: linear-gradient(to bottom, transparent, rgba(37, 99, 235, 0.1), transparent);
+    height: 100px;
+    background: linear-gradient(to bottom, transparent, rgba(59, 130, 246, 0.05), transparent);
     @apply animate-scanline pointer-events-none;
   }
 
   .grid-pattern {
     background-image: 
-      linear-gradient(to right, rgba(255,255,255,0.02) 1px, transparent 1px),
-      linear-gradient(to bottom, rgba(255,255,255,0.02) 1px, transparent 1px);
-    background-size: 60px 60px;
+      linear-gradient(to right, rgba(59, 130, 246, 0.05) 1px, transparent 1px),
+      linear-gradient(to bottom, rgba(59, 130, 246, 0.05) 1px, transparent 1px);
+    background-size: 40px 40px;
   }
   
   .grid-pattern-light {
     background-image: 
-      linear-gradient(to right, rgba(0,0,0,0.02) 1px, transparent 1px),
-      linear-gradient(to bottom, rgba(0,0,0,0.02) 1px, transparent 1px);
-    background-size: 60px 60px;
+      linear-gradient(to right, rgba(0, 0, 0, 0.03) 1px, transparent 1px),
+      linear-gradient(to bottom, rgba(0, 0, 0, 0.03) 1px, transparent 1px);
+    background-size: 40px 40px;
   }
 
-  .gradient-text {
-    @apply bg-clip-text text-transparent bg-gradient-to-r from-primary to-accent;
+  .hero-gradient {
+    background: radial-gradient(circle at 50% 50%, rgba(59, 130, 246, 0.1) 0%, transparent 70%);
   }
 
-  .writing-vertical {
-    writing-mode: vertical-rl;
+  .no-scrollbar::-webkit-scrollbar {
+    display: none;
   }
-
-  .animate-spin-slow {
-    animation: spin 8s linear infinite;
-  }
-
-  @keyframes spin {
-    from { transform: rotate(0deg); }
-    to { transform: rotate(360deg); }
+  .no-scrollbar {
+    -ms-overflow-style: none;
+    scrollbar-width: none;
   }
 }
