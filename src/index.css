@@ -50,8 +50,23 @@
     box-shadow: 0 0 25px rgba(124, 58, 237, 0.25);
   }
 
+  .glow-green {
+    box-shadow: 0 0 25px rgba(34, 197, 94, 0.25);
+  }
+
+  .glow-red {
+    box-shadow: 0 0 25px rgba(239, 68, 68, 0.25);
+  }
+
   .text-glow-blue {
     text-shadow: 0 0 15px rgba(37, 99, 235, 0.5);
+  }
+
+  .scanline {
+    width: 100%;
+    height: 4px;
+    background: linear-gradient(to bottom, transparent, rgba(37, 99, 235, 0.1), transparent);
+    @apply animate-scanline pointer-events-none;
   }
 
   .grid-pattern {
@@ -70,5 +85,18 @@
 
   .gradient-text {
     @apply bg-clip-text text-transparent bg-gradient-to-r from-primary to-accent;
+  }
+
+  .writing-vertical {
+    writing-mode: vertical-rl;
+  }
+
+  .animate-spin-slow {
+    animation: spin 8s linear infinite;
+  }
+
+  @keyframes spin {
+    from { transform: rotate(0deg); }
+    to { transform: rotate(360deg); }
   }
 }

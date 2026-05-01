@@ -25,20 +25,26 @@ import {
   Mail,
   Key,
   Plus,
+  PlusCircle,
   CheckCircle2,
   Circle,
   Trash2,
   Loader2,
   Settings,
   ShieldCheck,
+  ShieldAlert,
   Upload,
   Calendar,
   Zap,
   ArrowUpRight,
+  ArrowRight,
   MessageCircle,
   MessageSquare,
   Send,
-  Bot
+  Bot,
+  Activity,
+  Rss,
+  Radio
 } from 'lucide-react';
 import { motion, AnimatePresence } from 'motion/react';
 import { 
@@ -135,7 +141,7 @@ const INITIAL_ARTICLES: Partial<Article>[] = [
     imageUrl: 'https://images.unsplash.com/photo-1581091226825-a6a2a5aee158?q=80&w=800&auto=format&fit=crop',
     author: 'BrieflyX Editorial',
     isTrending: true,
-    status: 'pending',
+    status: 'approved',
     sources: [
       { name: 'Zurich Neural Institute', url: 'https://example.com/zurich' },
       { name: 'Wetware Weekly', url: 'https://example.com/wetware' }
@@ -149,7 +155,7 @@ const INITIAL_ARTICLES: Partial<Article>[] = [
     imageUrl: 'https://images.unsplash.com/photo-1545143333-636a666418ce?q=80&w=800&auto=format&fit=crop',
     author: 'Dr. Sora Vane',
     isTrending: false,
-    status: 'pending',
+    status: 'approved',
     sources: [
       { name: 'Urban Evolution Journal', url: 'https://example.com/urban' },
       { name: 'Shanghai Tech Daily', url: 'https://example.com/shanghai' }
@@ -163,7 +169,7 @@ const INITIAL_ARTICLES: Partial<Article>[] = [
     imageUrl: 'https://images.unsplash.com/photo-1635070041078-e363dbe005cb?q=80&w=800&auto=format&fit=crop',
     author: 'Nexus Science Bureau',
     isTrending: true,
-    status: 'pending',
+    status: 'approved',
     sources: [
       { name: 'NASA Deep Space', url: 'https://example.com/nasa' },
       { name: 'Quantum Physics Review', url: 'https://example.com/quantum' }
@@ -175,7 +181,64 @@ const INITIAL_ARTICLES: Partial<Article>[] = [
 
 // --- Components ---
 
-const Navbar = ({ isDarkMode, toggleTheme, activeView, onNavigate, isLoggedIn, openAuth, isAdmin }: any) => {
+const ExchangeTicker = ({ isDarkMode }: { isDarkMode: boolean }) => {
+  const [rates, setRates] = useState<any>(null);
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    const fetchRates = async () => {
+      try {
+        const response = await fetch('https://open.er-api.com/v6/latest/USD');
+        const data = await response.json();
+        setRates(data.rates);
+      } catch (error) {
+        console.error('Failed to fetch rates', error);
+      } finally {
+        setLoading(false);
+      }
+    };
+    fetchRates();
+    const interval = setInterval(fetchRates, 300000); // 5 mins
+    return () => clearInterval(interval);
+  }, []);
+
+  if (loading || !rates) return null;
+
+  const pairs = [
+    { label: 'EUR/USD', value: (1 / rates.EUR).toFixed(4) },
+    { label: 'GBP/USD', value: (1 / rates.GBP).toFixed(4) },
+    { label: 'JPY/USD', value: (1 / rates.JPY).toFixed(4) },
+    { label: 'AUD/USD', value: (1 / rates.AUD).toFixed(4) },
+    { label: 'CAD/USD', value: (1 / rates.CAD).toFixed(4) },
+    { label: 'CHF/USD', value: (1 / rates.CHF).toFixed(4) },
+  ];
+
+  return (
+    <div className={`fixed top-0 left-0 right-0 z-[60] h-6 flex items-center overflow-hidden border-b transition-colors duration-500 uppercase font-bold ${
+      isDarkMode ? 'bg-black/90 border-white/10 backdrop-blur-md' : 'bg-white/90 border-black/10 backdrop-blur-md'
+    }`}>
+      <motion.div 
+        animate={{ x: [0, -2000] }}
+        transition={{ duration: 60, repeat: Infinity, ease: "linear" }}
+        className="flex gap-12 items-center whitespace-nowrap pl-[100%]"
+      >
+        {[...Array(10)].map((_, i) => (
+          <div key={i} className="flex gap-12">
+            {pairs.map(pair => (
+              <div key={pair.label} className="flex items-center gap-3">
+                <span className={`text-[9px] font-black tracking-[0.2em] italic text-primary`}>{pair.label}</span>
+                <span className={`text-[10px] font-mono leading-none ${isDarkMode ? 'text-white/80' : 'text-black/80'}`}>{pair.value}</span>
+                <div className="w-1 h-1 rounded-full bg-green-500 animate-pulse" />
+              </div>
+            ))}
+          </div>
+        ))}
+      </motion.div>
+    </div>
+  );
+};
+
+const Navbar = ({ isDarkMode, toggleTheme, activeView, onNavigate, isLoggedIn, openAuth, isAdmin, searchQuery, setSearchQuery }: any) => {
   const [isScrolled, setIsScrolled] = useState(false);
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   
@@ -186,30 +249,59 @@ const Navbar = ({ isDarkMode, toggleTheme, activeView, onNavigate, isLoggedIn, o
   }, []);
 
   return (
-    <nav className={`fixed top-0 left-0 right-0 z-50 transition-all duration-500 ${
+    <nav className={`fixed top-6 left-0 right-0 z-50 transition-all duration-500 ${
       isScrolled ? 'py-4' : 'py-8'
     }`}>
       <div className="max-w-7xl mx-auto px-6 md:px-12">
-        <div className={`rounded-3xl border transition-all duration-500 px-8 py-4 flex items-center justify-between ${
+        <div className={`rounded-3xl border transition-all duration-500 px-8 py-4 flex items-center gap-4 justify-between ${
           isDarkMode 
             ? 'glass-dark glow-blue border-white/5' 
             : 'glass shadow-2xl border-black/5'
         }`}>
           <div 
-            className="flex items-center gap-3 cursor-pointer group"
+            className="flex items-center gap-4 cursor-pointer group shrink-0"
             onClick={() => onNavigate('home')}
           >
-            <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-primary to-accent flex items-center justify-center text-white shadow-lg group-hover:glow-blue transition-all group-active:scale-95">
-              <Newspaper size={20} />
+            <div className="relative">
+              <div className="w-12 h-12 rounded-2xl bg-gradient-to-br from-primary to-accent flex items-center justify-center text-white shadow-2xl group-hover:glow-blue transition-all group-active:scale-95 relative z-10">
+                <Activity size={24} className="group-hover:animate-pulse" />
+              </div>
+              <div className="absolute inset-0 bg-primary/20 rounded-2xl blur-xl group-hover:blur-2xl transition-all animate-pulse" />
             </div>
-            <span className={`text-xl font-black tracking-tight uppercase ${isDarkMode ? 'text-white' : 'text-black'}`}>Briefly<span className="text-primary italic">X</span></span>
+            <div className="flex flex-col">
+              <span className={`text-xl hidden lg:block font-black tracking-tighter uppercase leading-none ${isDarkMode ? 'text-white' : 'text-black'}`}>Neural<br /><span className="text-primary italic">Nexus.</span></span>
+            </div>
+          </div>
+
+          <div className="flex-1 max-w-md hidden md:block group relative">
+            <div className={`absolute left-4 top-1/2 -translate-y-1/2 transition-colors duration-300 ${searchQuery ? 'text-primary' : 'opacity-40'}`}>
+              <Search size={18} />
+            </div>
+            <input 
+              type="text"
+              value={searchQuery}
+              onChange={(e) => setSearchQuery(e.target.value)}
+              placeholder="SEARCH NEURAL NEXUS..."
+              className={`w-full pl-14 pr-10 py-3.5 rounded-[1.5rem] text-[10px] font-black tracking-widest transition-all outline-none border ${
+                isDarkMode 
+                  ? 'bg-white/[0.03] border-white/5 focus:bg-white/[0.08] focus:border-primary/50 text-white placeholder:text-white/40' 
+                  : 'bg-black/[0.03] border-black/5 focus:bg-white focus:border-primary/30 shadow-sm text-black placeholder:text-black/40'
+              }`}
+            />
+            {searchQuery && (
+              <button 
+                onClick={() => setSearchQuery('')}
+                className="absolute right-4 top-1/2 -translate-y-1/2 opacity-20 hover:opacity-100 transition-opacity p-2 hover:bg-black/10 rounded-lg"
+              >
+                <X size={16} />
+              </button>
+            )}
           </div>
 
           {/* Desktop Nav */}
-          <div className="hidden md:flex items-center gap-2">
+          <div className="hidden md:flex items-center gap-2 shrink-0">
             <NavLink label="Feed" onClick={() => onNavigate('feed')} active={activeView === 'feed'} isDarkMode={isDarkMode} />
             <NavLink label="About Us" onClick={() => onNavigate('about')} active={activeView === 'about'} isDarkMode={isDarkMode} />
-            <NavLink label="Contact Us" onClick={() => onNavigate('contact')} active={activeView === 'contact'} isDarkMode={isDarkMode} />
             
             {isLoggedIn && isAdmin && (
               <NavLink label="Admin Center" onClick={() => onNavigate('admin')} active={activeView === 'admin'} isDarkMode={isDarkMode} />
@@ -223,12 +315,14 @@ const Navbar = ({ isDarkMode, toggleTheme, activeView, onNavigate, isLoggedIn, o
               {isDarkMode ? <Sun size={20} /> : <Moon size={20} />}
             </button>
             {!isLoggedIn ? (
-              <button 
+              <motion.button 
+                whileHover={{ scale: 1.05 }}
+                whileTap={{ scale: 0.95 }}
                 onClick={openAuth}
-                className="ml-2 px-6 py-3 rounded-xl bg-gradient-to-r from-primary to-accent text-white font-black text-xs uppercase tracking-widest glow-blue hover:scale-105 active:scale-95 transition-all shadow-lg"
+                className="ml-4 px-10 py-3.5 rounded-2xl bg-primary text-white font-black uppercase tracking-[0.2em] text-[10px] glow-blue shadow-xl transition-all"
               >
-                Access
-              </button>
+                Authenticate
+              </motion.button>
             ) : (
                <button 
                 onClick={() => onNavigate('profile')}
@@ -266,6 +360,30 @@ const Navbar = ({ isDarkMode, toggleTheme, activeView, onNavigate, isLoggedIn, o
             }`}
           >
             <div className="flex flex-col gap-4 items-center">
+              <div className="w-full relative group">
+                <div className={`absolute left-4 top-1/2 -translate-y-1/2 transition-colors duration-300 ${searchQuery ? 'text-primary' : 'opacity-20'}`}>
+                  <Search size={16} />
+                </div>
+                <input 
+                  type="text"
+                  value={searchQuery}
+                  onChange={(e) => setSearchQuery(e.target.value)}
+                  placeholder="Neural Search..."
+                  className={`w-full pl-12 pr-10 py-4 rounded-2xl text-xs font-bold transition-all outline-none border ${
+                    isDarkMode 
+                      ? 'bg-white/5 border-white/5 focus:bg-white/10 focus:border-primary/50 text-white placeholder:text-white/20' 
+                      : 'bg-black/5 border-black/5 focus:bg-white focus:border-primary/30 shadow-sm text-black placeholder:text-black/20'
+                  }`}
+                />
+                {searchQuery && (
+                  <button 
+                    onClick={() => setSearchQuery('')}
+                    className="absolute right-4 top-1/2 -translate-y-1/2 opacity-20 hover:opacity-100 transition-opacity"
+                  >
+                    <X size={14} />
+                  </button>
+                )}
+              </div>
               <NavLink label="Feed" onClick={() => { onNavigate('feed'); setIsMenuOpen(false); }} active={activeView === 'feed'} isDarkMode={isDarkMode} />
               <NavLink label="About Us" onClick={() => { onNavigate('about'); setIsMenuOpen(false); }} active={activeView === 'about'} isDarkMode={isDarkMode} />
               <NavLink label="Contact Us" onClick={() => { onNavigate('contact'); setIsMenuOpen(false); }} active={activeView === 'contact'} isDarkMode={isDarkMode} />
@@ -350,7 +468,7 @@ const Footer = ({ onNavigate, isDarkMode }: { onNavigate: (v: any) => void, isDa
         </div>
         
         <div className="space-y-6">
-          <h4 className="text-[10px] font-black uppercase tracking-[0.3em] opacity-40">Protocol</h4>
+          <h4 className="text-[10px] font-black uppercase tracking-[0.3em]">Protocol</h4>
           <ul className="space-y-3">
             <li><button onClick={() => onNavigate('home')} className="text-sm font-bold opacity-60 hover:opacity-100 hover:text-blue-500 transition-all uppercase tracking-widest text-xs">Home</button></li>
             <li><button onClick={() => onNavigate('about')} className="text-sm font-bold opacity-60 hover:opacity-100 hover:text-blue-500 transition-all uppercase tracking-widest text-xs">About Us</button></li>
@@ -359,7 +477,7 @@ const Footer = ({ onNavigate, isDarkMode }: { onNavigate: (v: any) => void, isDa
         </div>
 
         <div className="space-y-6">
-          <h4 className="text-[10px] font-black uppercase tracking-[0.3em] opacity-40">Frequency</h4>
+          <h4 className="text-[10px] font-black uppercase tracking-[0.3em]">Frequency</h4>
           <ul className="space-y-3">
             <li><button className="text-sm font-bold opacity-60 hover:opacity-100 hover:text-blue-500 transition-all uppercase tracking-widest text-xs">Twitter / X</button></li>
             <li><button className="text-sm font-bold opacity-60 hover:opacity-100 hover:text-blue-500 transition-all uppercase tracking-widest text-xs">Nexus Telegram</button></li>
@@ -415,60 +533,107 @@ const SkeletonTrendingCard = ({ isDarkMode }: any) => (
 const ArticleCard = ({ 
   article, 
   isDarkMode, 
-  onClick 
+  onClick,
+  progress
 }: any) => {
+  const [imageLoaded, setImageLoaded] = useState(false);
+
+  const percentage = progress ? Math.min(100, Math.round(((progress.lastLineRead + 1) / progress.totalLines) * 100)) : 0;
+
   return (
     <motion.div
-      whileHover={{ y: -12, scale: 1.02, boxShadow: isDarkMode ? '0 20px 40px rgba(0,0,0,0.4)' : '0 20px 40px rgba(0,0,0,0.1)' }}
+      layout
+      initial={{ opacity: 0, y: 20 }}
+      animate={{ opacity: 1, y: 0 }}
+      whileHover={{ y: -12, scale: 1.02, boxShadow: isDarkMode ? '0 0 50px -10px rgba(59,130,246,0.3)' : '0 20px 40px -10px rgba(0,0,0,0.1)' }}
       whileTap={{ scale: 0.98 }}
       onClick={() => onClick(article)}
-      className={`group relative overflow-hidden rounded-[2rem] cursor-pointer transition-all duration-500 border ${
+      className={`group relative overflow-hidden rounded-[2.5rem] cursor-pointer transition-all duration-500 border ${
         isDarkMode 
-          ? 'bg-card-dark/40 border-white/5 hover:border-primary/50 shadow-2xl hover:glow-blue' 
-          : 'bg-card-light/50 border-black/5 hover:border-primary/30 shadow shadow-primary/10 hover:shadow-xl'
+          ? 'bg-white/[0.03] border-white/5 hover:border-primary/50' 
+          : 'bg-white border-black/5 hover:border-primary/30 shadow-sm'
       }`}
     >
-      <div className="aspect-[16/10] overflow-hidden relative">
-        <img 
+      <div className="aspect-[1.5] overflow-hidden relative">
+        <motion.img 
+          initial={{ opacity: 0 }}
+          animate={{ opacity: imageLoaded ? 1 : 0 }}
+          transition={{ duration: 0.8, ease: "easeOut" }}
           src={article.imageUrl} 
           alt={article.title} 
-          className="w-full h-full object-cover transition-transform duration-1000 group-hover:scale-110"
+          onLoad={() => setImageLoaded(true)}
+          className="w-full h-full object-cover transition-transform duration-[1.5s] ease-out group-hover:scale-110"
           referrerPolicy="no-referrer"
         />
-        <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-transparent to-transparent opacity-60 group-hover:opacity-90 transition-opacity" />
-        <div className="absolute top-6 left-6">
-          <span className="px-3 py-1 rounded bg-primary/20 backdrop-blur-md border border-primary/30 text-primary text-[8px] font-black uppercase tracking-[0.2em] shadow-lg">
+        {!imageLoaded && (
+          <div className="absolute inset-0 bg-current/5 animate-pulse" />
+        )}
+        <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/20 to-transparent opacity-60 group-hover:opacity-40 transition-opacity duration-700" />
+        
+        {/* Technical HUD Overlay */}
+        <div className="absolute top-6 left-6 flex items-center gap-2">
+          <div className="px-3 py-1 rounded-full bg-black/40 backdrop-blur-xl border border-white/10 flex items-center gap-2">
+            <div className="w-1.5 h-1.5 rounded-full bg-primary animate-pulse shadow-[0_0_8px_rgba(59,130,246,0.8)]" />
+            <span className="text-[9px] font-black uppercase tracking-widest text-white/80">Signal Active</span>
+          </div>
+          <span className="px-3 py-1 rounded-full bg-primary/30 backdrop-blur-md border border-primary/30 text-primary text-[8px] font-black uppercase tracking-widest">
             {article.category}
           </span>
         </div>
-        <div className="absolute inset-x-0 h-1 bg-primary/20 shadow-[0_0_15px_rgba(37,99,237,0.4)] animate-scanline pointer-events-none opacity-0 group-hover:opacity-100" />
+
+        <div className="absolute bottom-6 right-6 opacity-0 group-hover:opacity-100 transition-all duration-500 translate-y-2 group-hover:translate-y-0 text-white z-10">
+          <div className="w-12 h-12 rounded-2xl bg-white/20 backdrop-blur-xl border border-white/30 flex items-center justify-center text-white">
+            <ArrowRight size={24} />
+          </div>
+        </div>
+
+        {/* Progress indicator for logged in users */}
+        {progress && (
+          <div className="absolute bottom-0 left-0 w-full h-1 bg-white/10 overflow-hidden">
+            <motion.div 
+              initial={{ width: 0 }}
+              animate={{ width: `${percentage}%` }}
+              transition={{ duration: 1, ease: "easeOut" }}
+              className={`h-full ${percentage >= 100 ? 'bg-green-500' : 'bg-primary'} glow-blue`}
+            />
+          </div>
+        )}
       </div>
       
-      <div className="p-8">
-        <div className="flex items-center justify-between mb-4">
-          <div className="flex items-center gap-3 text-[9px] uppercase font-black tracking-widest opacity-30">
-            <span>{article.author}</span>
-            <span className="w-1 h-1 rounded-full bg-primary" />
-            <span>{article.createdAt?.toDate ? article.createdAt.toDate().toLocaleDateString() : 'Nexus Sync'}</span>
-          </div>
-          {article.isTrending && (
-            <div className="flex items-center gap-1.5 px-2 py-0.5 rounded-full bg-primary/10 border border-primary/20 text-primary text-[7px] font-black uppercase tracking-widest animate-pulse">
-              <Zap size={10} /> Trending
+      <div className="p-8 space-y-4">
+        <div className="space-y-1">
+          <div className="flex items-center justify-between">
+            <div className="flex items-center gap-2 text-[9px] uppercase font-black tracking-[0.2em] opacity-70">
+              <span className="text-primary italic"># {article.author}</span>
+              <span className="w-1 h-1 rounded-full bg-current" />
+              <span>5m UPLINK</span>
             </div>
-          )}
+            {progress && (
+              <span className={`text-[9px] font-black tracking-widest uppercase italic ${percentage >= 100 ? 'text-green-500' : 'text-primary opacity-80'}`}>
+                {percentage}% ANALYZED
+              </span>
+            )}
+          </div>
+          <h3 className="text-2xl font-black uppercase tracking-tighter leading-tight italic group-hover:text-primary transition-colors">
+            {article.title}
+          </h3>
         </div>
-        <h3 className={`text-xl font-black mb-4 leading-[1.2] uppercase tracking-tight transition-colors ${isDarkMode ? 'group-hover:text-primary' : 'group-hover:text-primary'}`}>
-          {article.title}
-        </h3>
-        <p className={`text-xs line-clamp-2 opacity-50 font-medium leading-relaxed mb-6`}>
+        
+        <p className="text-sm opacity-70 line-clamp-2 leading-relaxed font-medium italic">
           {article.summary}
         </p>
-        
-        <div className="flex items-center justify-between pt-6 border-t border-current opacity-5 group-hover:opacity-20 transition-opacity">
-          <div className="flex items-center gap-2 text-[10px] font-black tracking-[0.2em] uppercase text-primary">
-            Process Signal
-          </div>
-          <ChevronRight size={16} className="transition-transform duration-300 group-hover:translate-x-1 text-primary" />
+
+        <div className="pt-4 border-t border-current opacity-20 flex items-center justify-between">
+           <span className="text-[10px] font-black uppercase tracking-widest opacity-80">
+             {article.createdAt?.toDate ? article.createdAt.toDate().toLocaleDateString() : 'Nexus Sync'}
+           </span>
+           <div className="flex -space-x-2">
+             {[1,2,3].map(i => (
+               <div key={i} className="w-6 h-6 rounded-lg border-2 border-background bg-primary/10 overflow-hidden">
+                 <img src={`https://api.dicebear.com/7.x/avataaars/svg?seed=user${i}`} className="w-full h-full object-cover" />
+               </div>
+             ))}
+           </div>
         </div>
       </div>
     </motion.div>
@@ -524,8 +689,19 @@ const CommentsSection = ({ articleId, isDarkMode, user, openAuth }: { articleId:
       setText('');
     } catch (err) {
       handleFirestoreError(err, OperationType.WRITE, 'comments');
+      alert('Failed to transmit feedback. Signal interference.');
     } finally {
       setLoading(false);
+    }
+  };
+
+  const handleDeleteComment = async (commentId: string) => {
+    if (!confirm('Purge this neural feedback signal?')) return;
+    try {
+      await deleteDoc(doc(db, `comments/${commentId}`));
+    } catch (err) {
+      handleFirestoreError(err, OperationType.DELETE, `comments/${commentId}`);
+      alert('Failed to purge feedback. Neural link rejected.');
     }
   };
 
@@ -606,6 +782,14 @@ const CommentsSection = ({ articleId, isDarkMode, user, openAuth }: { articleId:
                       {comment.createdAt?.toDate ? formatDistanceToNow(comment.createdAt.toDate(), { addSuffix: true }) : 'Neural Syncing...'}
                     </span>
                   </div>
+                  {(user?.uid === comment.userId || (user?.email === 'gawesh.bwela@gmail.com')) && (
+                    <button 
+                      onClick={() => handleDeleteComment(comment.id)}
+                      className="p-2 opacity-0 group-hover:opacity-100 transition-opacity text-red-500 hover:bg-red-500/10 rounded-lg"
+                    >
+                      <Trash2 size={14} />
+                    </button>
+                  )}
                 </div>
                 <p className="text-base font-medium leading-relaxed opacity-70 italic">"{comment.text}"</p>
               </div>
@@ -656,29 +840,39 @@ const ArticlePage = ({
       className="max-w-4xl mx-auto"
     >
       <ChatWidget article={article} isDarkMode={isDarkMode} user={user} dailyStats={dailyStats} />
-      <div className="relative aspect-[21/9] rounded-[3rem] overflow-hidden mb-12 group">
-        <img src={article.imageUrl} alt={article.title} className="w-full h-full object-cover transition-transform duration-[2s] group-hover:scale-110" />
-        <div className="absolute inset-0 bg-gradient-to-t from-black via-transparent to-transparent opacity-60 group-hover:opacity-80 transition-opacity" />
-        <div className="absolute bottom-0 left-0 p-12 translate-y-2 group-hover:translate-y-0 transition-transform duration-500">
-          <motion.span 
-            whileHover={{ scale: 1.1, x: 5 }}
-            className="px-3 py-1 rounded bg-blue-500 text-white text-[10px] font-black uppercase tracking-widest mb-4 inline-block cursor-default"
-          >
-            {article.category}
-          </motion.span>
-          <h1 className="text-4xl md:text-5xl font-black text-white leading-none uppercase tracking-tighter drop-shadow-2xl">{article.title}</h1>
+      <div className="relative aspect-[21/9] rounded-[4rem] overflow-hidden mb-20 group border border-current opacity-20">
+        <img src={article.imageUrl} alt={article.title} className="w-full h-full object-cover transition-transform duration-[3s] ease-out group-hover:scale-105" />
+        <div className="absolute inset-0 bg-gradient-to-t from-black via-black/20 to-transparent opacity-80" />
+        <div className="absolute inset-0 flex flex-col justify-end p-16 md:p-24 space-y-6">
+          <div className="flex items-center gap-3">
+            <div className="px-4 py-1.5 rounded-full bg-primary/20 backdrop-blur-xl border border-primary/30 text-primary text-[10px] font-black uppercase tracking-[0.3em] shadow-[0_0_20px_rgba(59,130,246,0.5)]">
+              {article.category}
+            </div>
+            <div className="px-4 py-1.5 rounded-full bg-white/5 backdrop-blur-xl border border-white/10 text-white/40 text-[10px] font-black uppercase tracking-[0.3em]">
+              {article.readTime || '5m'} Sync
+            </div>
+          </div>
+          <h1 className="text-5xl md:text-7xl font-black text-white leading-[0.9] uppercase tracking-tighter italic drop-shadow-[0_0_30px_rgba(0,0,0,0.5)] max-w-4xl">{article.title}</h1>
         </div>
       </div>
 
-      <div className="space-y-12 mb-20 px-4">
+      <div className="space-y-20 mb-32 relative">
+        {/* Animated Reading Progress Sidebar */}
+        <div className="hidden lg:block absolute -left-32 top-0 h-full">
+          <div className="sticky top-48 space-y-4">
+             <div className="w-px h-64 bg-current opacity-10 mx-auto" />
+             <div className="text-[10px] font-black uppercase tracking-[0.5em] writing-vertical text-primary rotate-180 py-8 italic">Signal Intensity: 100%</div>
+             <div className="w-px h-64 bg-current opacity-10 mx-auto" />
+          </div>
+        </div>
+
         <motion.p 
-          whileHover={{ x: 5 }}
-          className="text-xl md:text-2xl font-bold opacity-60 leading-tight border-l-4 border-blue-500 pl-6 cursor-default transition-opacity hover:opacity-100"
+          className="text-2xl md:text-3xl font-medium opacity-70 leading-tight border-l-8 border-primary pl-10 italic max-w-3xl"
         >
           {article.summary}
         </motion.p>
 
-        <div className="space-y-1">
+        <div className="space-y-4">
           {lines.map((line, index) => {
             const isRead = progress ? index <= progress.lastLineRead : false;
             const isCurrent = progress ? index === progress.lastLineRead + 1 : index === 0;
@@ -689,23 +883,18 @@ const ArticlePage = ({
                 onClick={() => isLoggedIn && onProgressUpdate(index, lines.length)}
                 initial={false}
                 animate={{ 
-                  opacity: isRead ? 0.3 : (isCurrent ? 1 : 0.8),
-                  x: isCurrent ? 10 : 0
+                  opacity: isRead ? 0.2 : (isCurrent ? 1 : 0.6),
+                  x: isCurrent ? 20 : 0
                 }}
                 whileHover={{ 
-                  x: 20,
-                  scale: 1.03,
-                  backgroundColor: isDarkMode ? 'rgba(59,130,246,0.1)' : 'rgba(59,130,246,0.05)',
+                  x: 30,
                   opacity: 1,
-                  boxShadow: isDarkMode ? '0 0 40px rgba(59,130,246,0.2)' : '0 10px 30px rgba(59,130,246,0.1)',
-                  borderColor: 'rgba(59,130,246,0.5)',
-                  translateZ: 0,
                 }}
-                className={`text-lg md:text-xl font-medium leading-relaxed p-6 rounded-2xl cursor-pointer transition-all border duration-300 ${
+                className={`text-xl md:text-2xl font-medium leading-relaxed p-8 rounded-[2.5rem] cursor-pointer transition-all border duration-500 italic ${
                   isCurrent 
-                    ? 'bg-blue-500/10 border-blue-500/50 text-blue-400 shadow-[0_0_20px_rgba(58,130,246,0.2)]' 
-                    : 'border-transparent'
-                } ${!isLoggedIn && index > 2 ? 'blur-md select-none' : ''}`}
+                    ? 'bg-primary/10 border-primary/30 text-primary shadow-[0_0_40px_-10px_rgba(59,130,246,0.3)]' 
+                    : 'border-transparent hover:bg-current/[0.03]'
+                } ${!isLoggedIn && index > 2 ? 'blur-xl select-none opacity-20' : ''}`}
               >
                 {line}
               </motion.p>
@@ -788,8 +977,25 @@ const AdminDashboard = ({ articles, isDarkMode, user, loadingData }: { articles:
     }
   }, [editing]);
 
+  const isValidUrl = (url: string) => {
+    try {
+      new URL(url);
+      return true;
+    } catch {
+      return false;
+    }
+  };
+
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
+    
+    // Validate sources
+    const invalidSources = sources.filter(s => s.url && !isValidUrl(s.url));
+    if (invalidSources.length > 0) {
+      alert(`Invalid URL detected: ${invalidSources[0].url}. All sources must be valid URLs.`);
+      return;
+    }
+
     setLoading(true);
     const data = {
       title, summary, content, category, imageUrl,
@@ -829,6 +1035,7 @@ const AdminDashboard = ({ articles, isDarkMode, user, loadingData }: { articles:
       await deleteDoc(doc(db, `articles/${id}`));
     } catch (err) {
       handleFirestoreError(err, OperationType.DELETE, 'articles');
+      alert('Failed to dissolve signal. Check terminal permissions.');
     }
   };
 
@@ -878,84 +1085,137 @@ const AdminDashboard = ({ articles, isDarkMode, user, loadingData }: { articles:
   };
 
   return (
-    <div className="space-y-12">
-      <header className="flex justify-between items-end">
-        <div>
-          <h2 className="text-5xl font-black italic tracking-tighter uppercase">Command Center.</h2>
-          <div className="flex items-center gap-4 mt-2">
-            <p className="text-[10px] opacity-40 font-black tracking-[0.4em] uppercase">Manage Global Signals</p>
-            <div className="h-4 w-px bg-current opacity-10" />
-            <button onClick={handleReset} className="text-[8px] font-black uppercase text-red-500 hover:scale-110 transition-all opacity-40 hover:opacity-100">Purge & Re-Sync</button>
+    <div className="space-y-16">
+      <header className="flex flex-col lg:flex-row justify-between items-start lg:items-end gap-12 border-b border-current opacity-10 pb-12">
+        <div className="space-y-6">
+          <div className="flex items-center gap-4">
+            <div className="w-12 h-[2px] bg-primary glow-blue" />
+            <span className="text-[10px] font-black uppercase tracking-[0.4em]">System Role: Nexus Architect</span>
           </div>
+          <h2 className="text-6xl md:text-8xl font-black italic tracking-tighter uppercase leading-[0.8]">Neural<br /><span className="text-primary italic">Control Center.</span></h2>
         </div>
         <div className="flex gap-4">
-          <button onClick={handleSimulatePulse} disabled={loading} className="px-6 py-3 rounded-xl border border-primary/30 text-primary font-black text-xs uppercase tracking-widest hover:bg-primary/5 transition-all">Pulse Scan</button>
-          <button onClick={() => { setEditing(null); setShowAdd(true); }} className="px-6 py-3 rounded-xl bg-blue-500 text-white font-black text-xs uppercase tracking-widest glow-blue hover:scale-105 transition-all">Inject Signal</button>
+           <motion.button
+            whileHover={{ scale: 1.05 }}
+            whileTap={{ scale: 0.95 }}
+            onClick={() => { setEditing(null); setShowAdd(true); }}
+            className="px-10 py-5 rounded-2xl bg-primary text-white font-black uppercase tracking-widest text-[10px] glow-blue shadow-2xl flex items-center gap-3"
+          >
+            <PlusCircle size={18} /> Initialize New Signal
+          </motion.button>
+          <button
+            onClick={handleSimulatePulse}
+            className={`p-5 rounded-2xl border transition-all ${isDarkMode ? 'bg-white/5 border-white/10 opacity-40 hover:opacity-100' : 'bg-black/5 border-black/10 opacity-40 hover:opacity-100'}`}
+            title="Inject Mock Pulse"
+          >
+            <Activity size={20} />
+          </button>
+          <button
+             onClick={handleReset}
+             className="p-5 rounded-2xl bg-red-500/10 text-red-500 border border-red-500/20 opacity-40 hover:opacity-100 transition-all"
+             title="Dissolve All Signals"
+          >
+            <Zap size={20} />
+          </button>
         </div>
       </header>
 
       <div className="grid gap-4">
-        {loadingData ? (
-          Array(5).fill(0).map((_, i) => (
-            <div key={i} className={`p-6 rounded-3xl border animate-pulse ${isDarkMode ? 'bg-white/5 border-white/5' : 'bg-black/5 border-black/5'}`}>
+          {loadingData ? (
+            Array(5).fill(0).map((_, i) => (
+              <div key={i} className={`p-8 rounded-[2.5rem] border animate-pulse ${isDarkMode ? 'bg-white/5 border-white/5' : 'bg-black/5 border-black/5'}`}>
+                <div className="flex gap-8 items-center">
+                  <div className="w-24 h-24 rounded-3xl bg-gray-400/20" />
+                  <div className="flex-1 space-y-4">
+                     <div className="h-6 bg-gray-400/30 rounded-lg w-1/2" />
+                     <div className="h-2 bg-gray-400/10 rounded-full w-1/4" />
+                  </div>
+                </div>
+              </div>
+            ))
+          ) : articles.map(art => (
+            <motion.div 
+              key={art.id} 
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              whileHover={{ x: 10, scale: 1.01 }}
+              className={`p-8 rounded-[3rem] border flex items-center justify-between group transition-all duration-500 ${
+                isDarkMode 
+                  ? 'bg-white/[0.02] border-white/5 hover:border-primary/50 hover:bg-white/[0.05]' 
+                  : 'bg-white border-black/5 shadow-sm hover:shadow-xl hover:border-primary/30'
+              }`}
+            >
+              <div className="flex gap-8 items-center">
+                <div className="relative">
+                  <img src={art.imageUrl} className="w-24 h-24 rounded-[2rem] object-cover opacity-60 group-hover:opacity-100 transition-all duration-700 group-hover:scale-105" />
+                  <div className="absolute inset-0 rounded-[2rem] border-2 border-primary/20 scale-110 opacity-0 group-hover:opacity-100 transition-all duration-500" />
+                </div>
+                <div className="space-y-1">
+                  <div className="flex items-center gap-3">
+                    <h3 className="text-lg font-black uppercase tracking-tighter italic group-hover:text-primary transition-colors">{art.title}</h3>
+                    {art.isTrending && (
+                      <span className="px-2 py-0.5 rounded-full bg-primary/20 text-primary text-[7px] font-black uppercase tracking-widest animate-pulse border border-primary/30">
+                        Trending
+                      </span>
+                    )}
+                  </div>
+                  <div className="flex items-center gap-3 text-[10px] font-black uppercase tracking-[0.2em] opacity-70 italic">
+                    <span className="text-primary italic"># {art.category}</span>
+                    <span className="w-1 h-1 rounded-full bg-current" />
+                    <span>{art.createdAt?.toDate ? art.createdAt.toDate().toLocaleDateString() : 'SYNCED'}</span>
+                  </div>
+                </div>
+              </div>
               <div className="flex gap-6 items-center">
-                <div className="w-20 h-20 rounded-2xl bg-gray-400/20" />
-                <div className="flex-1 space-y-4">
-                   <div className="h-4 bg-gray-400/30 rounded-lg w-1/2" />
-                   <div className="h-2 bg-gray-400/10 rounded-full w-1/4" />
+                <div className="flex flex-col gap-1 items-end">
+                  {art.status === 'pending' && <span className="px-3 py-1 rounded-full bg-yellow-500/10 text-yellow-500 text-[8px] font-black uppercase tracking-widest border border-yellow-500/20 shadow-[0_0_15px_rgba(234,179,8,0.2)]">Pending Approval</span>}
+                  {art.status === 'approved' && <span className="px-3 py-1 rounded-full bg-green-500/10 text-green-500 text-[8px] font-black uppercase tracking-widest border border-green-500/20 shadow-[0_0_15px_rgba(34,197,94,0.2)]">Active Signal</span>}
+                  {art.status === 'rejected' && <span className="px-3 py-1 rounded-full bg-red-500/10 text-red-500 text-[8px] font-black uppercase tracking-widest border border-red-500/20 shadow-[0_0_15px_rgba(239,68,68,0.2)]">Neural Purge</span>}
+                </div>
+                
+                <div className="flex gap-3 p-1.5 rounded-2xl bg-current/[0.03] border border-current/10">
+                   <motion.button 
+                    whileHover={{ scale: 1.1 }}
+                    whileTap={{ scale: 0.9 }}
+                    onClick={() => handleStatusChange(art.id, 'approved')} 
+                    title="Approve Signal"
+                    className={`p-3 rounded-xl transition-all shadow-lg ${art.status === 'approved' ? 'bg-green-500 text-white glow-green' : 'hover:bg-green-500/20 text-green-500'}`}
+                  >
+                    <CheckCircle2 size={18} />
+                  </motion.button>
+                  <motion.button 
+                    whileHover={{ scale: 1.1 }}
+                    whileTap={{ scale: 0.9 }}
+                    onClick={() => handleStatusChange(art.id, 'rejected')} 
+                    title="Purge Signal"
+                    className={`p-3 rounded-xl transition-all shadow-lg ${art.status === 'rejected' ? 'bg-red-500 text-white glow-red' : 'hover:bg-red-500/20 text-red-500'}`}
+                  >
+                    <X size={18} />
+                  </motion.button>
+                </div>
+
+                <div className="h-12 w-px bg-current opacity-10 mx-2" />
+
+                <div className="flex gap-2">
+                  <motion.button 
+                    whileHover={{ scale: 1.1, rotate: 180 }}
+                    transition={{ duration: 0.5 }}
+                    onClick={() => setEditing(art)} 
+                    className="p-4 rounded-2xl hover:bg-primary/10 text-primary transition-all opacity-40 hover:opacity-100 border border-transparent hover:border-primary/30"
+                  >
+                    <Settings size={22} />
+                  </motion.button>
+                  <motion.button 
+                    whileHover={{ scale: 1.1 }}
+                    onClick={() => handleDelete(art.id)} 
+                    className="p-4 rounded-2xl hover:bg-red-500/10 text-red-500 transition-all opacity-40 hover:opacity-100 border border-transparent hover:border-red-500/30"
+                  >
+                    <Trash2 size={22} />
+                  </motion.button>
                 </div>
               </div>
-            </div>
-          ))
-        ) : articles.map(art => (
-          <motion.div 
-            key={art.id} 
-            whileHover={{ x: 10, scale: 1.01, backgroundColor: isDarkMode ? 'rgba(255,255,255,0.08)' : 'rgba(0,0,0,0.08)' }}
-            className={`p-6 rounded-3xl border flex items-center justify-between group transition-all ${
-              isDarkMode ? 'bg-white/5 border-white/10' : 'bg-black/5 border-black/10'
-            }`}
-          >
-            <div className="flex gap-6 items-center">
-              <img src={art.imageUrl} className="w-20 h-20 rounded-2xl object-cover opacity-60 group-hover:opacity-100 transition-opacity" />
-              <div>
-                <div className="flex items-center gap-2">
-                  <h3 className="font-black uppercase tracking-tight">{art.title}</h3>
-                  {art.isTrending && (
-                    <span className="px-1.5 py-0.5 rounded-full bg-primary/20 text-primary text-[6px] font-black uppercase tracking-widest animate-pulse">
-                      Trending
-                    </span>
-                  )}
-                </div>
-                <p className="text-[10px] opacity-40 font-black tracking-widest">{art.category} • {art.createdAt?.toDate ? art.createdAt.toDate().toLocaleDateString() : 'Recent'}</p>
-              </div>
-            </div>
-            <div className="flex gap-4 items-center">
-              <div className="flex flex-col gap-1 items-center">
-                {art.status === 'pending' && <span className="px-2 py-0.5 rounded-full bg-yellow-500/10 text-yellow-500 text-[6px] font-black uppercase tracking-widest border border-yellow-500/20">Pending</span>}
-                {art.status === 'approved' && <span className="px-2 py-0.5 rounded-full bg-green-500/10 text-green-500 text-[6px] font-black uppercase tracking-widest border border-green-500/20">Approved</span>}
-                {art.status === 'rejected' && <span className="px-2 py-0.5 rounded-full bg-red-500/10 text-red-500 text-[6px] font-black uppercase tracking-widest border border-red-500/20">Rejected</span>}
-              </div>
-              <div className="flex gap-2 p-1 rounded-xl bg-white/5 border border-white/10 opacity-0 group-hover:opacity-100 transition-opacity">
-                 <button 
-                  onClick={() => handleStatusChange(art.id, 'approved')} 
-                  title="Approve"
-                  className={`p-2 rounded-lg transition-all ${art.status === 'approved' ? 'bg-green-500 text-white' : 'hover:bg-green-500/20 text-green-500'}`}
-                >
-                  <ShieldCheck size={14} />
-                </button>
-                <button 
-                  onClick={() => handleStatusChange(art.id, 'rejected')} 
-                  title="Reject"
-                  className={`p-2 rounded-lg transition-all ${art.status === 'rejected' ? 'bg-red-500 text-white' : 'hover:bg-red-500/20 text-red-500'}`}
-                >
-                  <Trash2 size={14} />
-                </button>
-              </div>
-              <button onClick={() => setEditing(art)} className="p-3 rounded-full hover:bg-white/10 transition-colors opacity-40 hover:opacity-100"><Settings size={20} /></button>
-              <button onClick={() => handleDelete(art.id)} className="p-3 rounded-full hover:bg-red-500/10 text-red-500 transition-colors opacity-40 hover:opacity-100"><Trash2 size={20} /></button>
-            </div>
-          </motion.div>
-        ))}
+            </motion.div>
+          ))}
       </div>
 
       <Modal isOpen={showAdd} onClose={() => setShowAdd(false)} isDarkMode={isDarkMode} title={editing ? "Update Signal" : "Initialise Signal"}>
@@ -1201,7 +1461,7 @@ const Modal = ({ isOpen, onClose, isDarkMode, title, children }: any) => {
 
 const InputField = ({ label, type = 'text', placeholder, value, onChange, isDarkMode, required }: any) => (
   <div className="space-y-2">
-    <label className="text-[10px] font-black uppercase tracking-widest opacity-40 ml-4">{label}</label>
+    <label className="text-[10px] font-black uppercase tracking-widest ml-4">{label}</label>
     <input
       type={type} placeholder={placeholder} required={required} value={value}
       onChange={(e) => onChange && onChange(e.target.value)}
@@ -1413,6 +1673,16 @@ export default function App() {
   const [activeView, setActiveView] = useState<'home' | 'feed' | 'admin' | 'profile' | 'article' | 'about' | 'contact'>('home');
   const [selectedArticle, setSelectedArticle] = useState<Article | null>(null);
   const [showAuthModal, setShowAuthModal] = useState(false);
+  const [searchQuery, setSearchQuery] = useState('');
+  const [debouncedSearchQuery, setDebouncedSearchQuery] = useState('');
+
+  // Debouncing logic
+  useEffect(() => {
+    const handler = setTimeout(() => {
+      setDebouncedSearchQuery(searchQuery);
+    }, 400);
+    return () => clearTimeout(handler);
+  }, [searchQuery]);
   
   // Theme sync
   useEffect(() => {
@@ -1466,14 +1736,18 @@ export default function App() {
         // Ensure user profile exists
         const profRef = doc(db, `users/${currentUser.uid}`);
         const snap = await getDoc(profRef);
+        const isAdmin = currentUser.email === 'gawesh.bwela@gmail.com';
+        
         if (!snap.exists()) {
           await setDoc(profRef, {
             displayName: currentUser.displayName || currentUser.email?.split('@')[0],
             email: currentUser.email,
             photoURL: currentUser.photoURL || '',
-            isAdmin: currentUser.email === 'gawesh.bwela@gmail.com',
+            isAdmin: isAdmin,
             createdAt: serverTimestamp()
           });
+        } else if (isAdmin && !snap.data().isAdmin) {
+          await updateDoc(profRef, { isAdmin: true });
         }
       }
     });
@@ -1608,7 +1882,16 @@ export default function App() {
 
   // Rendering Views
   const renderHome = () => {
-    const approvedArticles = articles.filter(a => a.status === 'approved');
+    let approvedArticles = articles.filter(a => a.status === 'approved');
+    
+    if (debouncedSearchQuery) {
+      const query = debouncedSearchQuery.toLowerCase();
+      approvedArticles = approvedArticles.filter(a => 
+        a.title.toLowerCase().includes(query) || 
+        a.summary.toLowerCase().includes(query)
+      );
+    }
+
     const trending = approvedArticles.filter(a => a.isTrending).slice(0, 4);
     const latest = approvedArticles.filter(a => !a.isTrending).slice(0, 6);
 
@@ -1625,14 +1908,22 @@ export default function App() {
             >
               Neural Nexus Established
             </motion.div>
-            <h1 className="text-7xl md:text-9xl font-black italic tracking-tighter leading-[0.85] uppercase">
-              Pure.<br/>
-              Neural.<br/>
-              <span className="text-primary tracking-[-0.05em] drop-shadow-[0_0_30px_rgba(37,99,235,0.3)]">Signals.</span>
-            </h1>
-            <p className="text-sm md:text-base opacity-40 font-black tracking-[0.3em] uppercase max-w-xl mx-auto">
-              A minimalist terminal for high-velocity synthesis.
-            </p>
+            <motion.h1 
+              initial={{ opacity: 0, y: 50 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ delay: 0.1 }}
+              className="text-[12vw] lg:text-[10vw] font-black uppercase tracking-tighter italic leading-[0.8] mix-blend-difference"
+            >
+              Neural<br /><span className="text-primary italic">Nexus.</span>
+            </motion.h1>
+            <motion.p 
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              transition={{ delay: 0.3 }}
+              className="text-sm md:text-xl font-medium opacity-50 leading-relaxed italic max-w-xl mx-auto"
+            >
+              Synthesizing global signal streams into high-fidelity neural summaries. Access the future, zero latency.
+            </motion.p>
             <div className="flex justify-center gap-6 pt-12">
               <motion.button 
                 whileHover={{ scale: 1.05, y: -5 }}
@@ -1654,14 +1945,17 @@ export default function App() {
           </div>
         </section>
 
-        {/* Trending Flux Section */}
-        <section className="space-y-12">
-          <div className="flex items-center gap-4">
-            <div className="w-12 h-[1px] bg-primary/30" />
-            <h2 className="text-2xl font-black italic tracking-tighter uppercase text-primary">Trending Flux.</h2>
-            <div className="px-2 py-0.5 rounded bg-primary text-white text-[8px] font-black uppercase tracking-widest animate-pulse">Live</div>
+        <section className="space-y-16">
+          <div className="flex flex-col md:flex-row md:items-end justify-between gap-8 border-b border-current opacity-10 pb-8">
+            <div className="space-y-2">
+              <h2 className="text-4xl font-black uppercase tracking-tighter italic">Trending Flux</h2>
+              <p className="text-[10px] font-black uppercase tracking-[0.4em]">Status: Real-time Signal Processing</p>
+            </div>
+            <div className="flex gap-2">
+              <div className="px-3 py-1 rounded bg-primary/10 border border-primary/20 text-primary text-[8px] font-black uppercase tracking-widest animate-pulse">Live Uplink</div>
+            </div>
           </div>
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8">
             {loadingData ? (
               Array(4).fill(0).map((_, i) => <SkeletonTrendingCard key={i} isDarkMode={isDarkMode} />)
             ) : trending.length > 0 ? (
@@ -1694,16 +1988,27 @@ export default function App() {
 
         {/* Featured Grid */}
         <section className="space-y-12">
-          <div className="flex justify-between items-end">
-            <h2 className="text-4xl font-black italic tracking-tighter uppercase">Latest Transmissions.</h2>
-            <button onClick={() => setActiveView('feed')} className="text-xs font-black uppercase tracking-widest opacity-40 hover:opacity-100 hover:text-primary transition-all text-primary font-bold">View Archive +</button>
+          <div className="flex flex-col md:flex-row md:items-end justify-between gap-8 border-b border-current opacity-10 pb-8">
+            <div className="space-y-2 text-left">
+              <h2 className="text-5xl font-black uppercase tracking-tighter italic leading-none">Latest<br/><span className="text-primary italic">Transmissions.</span></h2>
+              <p className="text-[10px] font-black uppercase tracking-[0.4em]">System Status: Real-time Uplink Ready</p>
+            </div>
+            <button onClick={() => setActiveView('feed')} className="px-8 py-3.5 rounded-2xl border border-current opacity-20 hover:opacity-100 hover:text-primary hover:border-primary transition-all text-[10px] font-black uppercase tracking-widest">
+              Access Full Archive +
+            </button>
           </div>
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-x-8 gap-y-16">
             {loadingData ? (
               Array(6).fill(0).map((_, i) => <SkeletonCard key={i} isDarkMode={isDarkMode} />)
             ) : (
               latest.map(art => (
-                <ArticleCard key={art.id} article={art} isDarkMode={isDarkMode} onClick={(a) => { setSelectedArticle(a); setActiveView('article'); }} />
+                <ArticleCard 
+                  key={art.id} 
+                  article={art} 
+                  isDarkMode={isDarkMode} 
+                  progress={allProgress.find(p => p.articleId === art.id)}
+                  onClick={(a) => { setSelectedArticle(a); setActiveView('article'); }} 
+                />
               ))
             )}
           </div>
@@ -1715,7 +2020,15 @@ export default function App() {
   const renderFeed = () => {
     const preferredCats = preferences?.categories || [];
     
-    const approvedArticles = articles.filter(a => a.status === 'approved');
+    let approvedArticles = articles.filter(a => a.status === 'approved');
+    
+    if (debouncedSearchQuery) {
+      const query = debouncedSearchQuery.toLowerCase();
+      approvedArticles = approvedArticles.filter(a => 
+        a.title.toLowerCase().includes(query) || 
+        a.summary.toLowerCase().includes(query)
+      );
+    }
     
     const filtered = approvedArticles.filter(a => {
       const catMatch = feedFilter === 'All' || a.category === feedFilter;
@@ -1725,33 +2038,33 @@ export default function App() {
 
     return (
       <div className="space-y-16">
-        <header className="flex flex-col md:flex-row justify-between items-start md:items-end gap-12 border-b border-current pb-12 opacity-80">
-          <div>
-            <h2 className="text-6xl font-black italic tracking-tighter uppercase mb-4">Nexus Feed.</h2>
+        <header className="flex flex-col lg:flex-row justify-between items-start lg:items-end gap-12 border-b border-current opacity-10 pb-12">
+          <div className="space-y-6">
             <div className="flex items-center gap-4">
-              <div className="w-2 h-2 rounded-full bg-primary shadow-[0_0_8px_rgba(37,99,235,0.8)] animate-pulse" />
-              <p className="text-[10px] opacity-40 font-black tracking-[0.4em] uppercase">Status: Broadcasting Signals</p>
+              <div className="w-12 h-[px] bg-primary glow-blue" />
+              <span className="text-[10px] font-black uppercase tracking-[0.4em]">Frequency: Broad-Spectrum</span>
             </div>
+            <h2 className="text-6xl md:text-8xl font-black italic tracking-tighter uppercase leading-[0.8] mb-4">Nexus<br /><span className="text-primary italic">Signal Feed.</span></h2>
           </div>
           <div className="flex flex-wrap gap-2">
             <button
               onClick={() => setFeedFilter('All')}
-              className={`px-5 py-2.5 rounded-xl text-[10px] font-black uppercase tracking-widest transition-all border ${
+              className={`px-8 py-3.5 rounded-2xl text-[10px] font-black uppercase tracking-widest transition-all border ${
                 feedFilter === 'All'
-                  ? 'bg-primary border-primary text-white glow-blue shadow-lg'
-                  : isDarkMode ? 'bg-white/5 border-white/10 opacity-40 hover:opacity-100' : 'bg-black/5 border-black/10 opacity-40 hover:opacity-100'
+                  ? 'bg-primary border-primary text-white glow-blue shadow-xl'
+                  : isDarkMode ? 'bg-white/5 border-white/5 opacity-40 hover:opacity-100' : 'bg-black/5 border-black/5 opacity-40 hover:opacity-100'
               }`}
             >
-              All Signals
+              Master Stream
             </button>
             {CATEGORIES.map(cat => (
               <button
                 key={cat}
                 onClick={() => setFeedFilter(cat)}
-                className={`px-5 py-2.5 rounded-xl text-[10px] font-black uppercase tracking-widest transition-all border ${
+                className={`px-8 py-3.5 rounded-2xl text-[10px] font-black uppercase tracking-widest transition-all border ${
                   feedFilter === cat
-                    ? 'bg-primary border-primary text-white glow-blue shadow-lg'
-                    : isDarkMode ? 'bg-white/5 border-white/10 opacity-40 hover:opacity-100' : 'bg-black/5 border-black/10 opacity-40 hover:opacity-100'
+                    ? 'bg-primary border-primary text-white glow-blue shadow-xl'
+                    : isDarkMode ? 'bg-white/5 border-white/5 opacity-40 hover:opacity-100 hover:text-primary hover:border-primary' : 'bg-black/5 border-black/5 opacity-40 hover:opacity-100 hover:text-primary hover:border-primary'
                 }`}
               >
                 {cat}
@@ -1771,7 +2084,13 @@ export default function App() {
              Array(6).fill(0).map((_, i) => <SkeletonCard key={i} isDarkMode={isDarkMode} />)
           ) : (
             filtered.map(art => (
-              <ArticleCard key={art.id} article={art} isDarkMode={isDarkMode} onClick={(a) => { setSelectedArticle(a); setActiveView('article'); }} />
+              <ArticleCard 
+                key={art.id} 
+                article={art} 
+                isDarkMode={isDarkMode} 
+                progress={allProgress.find(p => p.articleId === art.id)}
+                onClick={(a) => { setSelectedArticle(a); setActiveView('article'); }} 
+              />
             ))
           )}
         </div>
@@ -1780,104 +2099,159 @@ export default function App() {
   };
 
   const renderProfile = () => (
-    <div className="max-w-3xl mx-auto space-y-12">
-      <div className="p-12 rounded-[3rem] bg-white/5 border border-white/10 text-center relative overflow-hidden">
-        <div className="absolute top-0 right-0 w-32 h-32 bg-blue-500/10 blur-[60px] -mr-16 -mt-16" />
+    <div className="max-w-4xl mx-auto space-y-16">
+      <div className={`p-16 rounded-[4rem] border relative overflow-hidden transition-all duration-700 ${
+        isDarkMode ? 'bg-white/[0.02] border-white/10' : 'bg-white border-black/5 shadow-xl'
+      }`}>
+        <div className="absolute top-0 right-0 w-96 h-96 bg-primary/10 blur-[120px] -mr-48 -mt-48 rounded-full animate-pulse" />
+        <div className="absolute bottom-0 left-0 w-64 h-64 bg-accent/5 blur-[80px] -ml-32 -mb-32 rounded-full" />
         
         {isEditingProfile ? (
-          <form onSubmit={handleUpdateProfile} className="space-y-6 relative z-10">
-            <div className="w-32 h-32 rounded-full overflow-hidden mx-auto mb-8 bg-blue-500/20 glow-blue">
-              {editPhotoURL ? <img src={editPhotoURL} className="w-full h-full object-cover" /> : <User size={64} className="m-auto mt-8 opacity-20" />}
+          <form onSubmit={handleUpdateProfile} className="space-y-8 relative z-10">
+            <div className="relative w-40 h-40 mx-auto group">
+              <div className="w-full h-full rounded-full overflow-hidden border-4 border-primary/30 p-1 glow-blue transition-transform duration-500 group-hover:scale-105">
+                {editPhotoURL ? (
+                  <img src={editPhotoURL} className="w-full h-full rounded-full object-cover" />
+                ) : (
+                  <div className="w-full h-full rounded-full bg-primary/10 flex items-center justify-center">
+                    <User size={64} className="opacity-20" />
+                  </div>
+                )}
+              </div>
             </div>
-            <InputField label="Identity Designation" value={editName} onChange={setEditName} isDarkMode={isDarkMode} required />
-            <InputField label="Neural Image URL" value={editPhotoURL} onChange={setEditPhotoURL} isDarkMode={isDarkMode} />
-            <div className="flex gap-4">
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+              <InputField label="Identity Designation" value={editName} onChange={setEditName} isDarkMode={isDarkMode} required />
+              <InputField label="Neural Image URL" value={editPhotoURL} onChange={setEditPhotoURL} isDarkMode={isDarkMode} />
+            </div>
+            <div className="flex gap-4 pt-4">
               <button 
                 type="button" 
                 onClick={() => setIsEditingProfile(false)} 
-                className={`flex-1 py-4 rounded-xl border font-black text-xs uppercase tracking-widest transition-all ${isDarkMode ? 'border-white/10 text-white/40 hover:text-white' : 'border-black/10 text-black/40 hover:text-black'}`}
+                className={`flex-1 py-5 rounded-2xl border font-black text-[10px] uppercase tracking-[0.3em] transition-all italic ${isDarkMode ? 'border-white/10 text-white/40 hover:text-white hover:bg-white/5' : 'border-black/10 text-black/40 hover:text-black hover:bg-black/5'}`}
               >
-                Cancel
+                Cancel Protocol
               </button>
               <button 
                 type="submit" 
                 disabled={updatingProfile}
-                className="flex-1 py-4 rounded-xl bg-primary text-white font-black text-xs uppercase tracking-widest glow-blue hover:scale-105 transition-all shadow-lg active:scale-95 flex items-center justify-center"
+                className="flex-1 py-5 rounded-2xl bg-primary text-white font-black text-[10px] uppercase tracking-[0.3em] glow-blue hover:scale-105 transition-all shadow-2xl active:scale-95 flex items-center justify-center italic"
               >
-                {updatingProfile ? <Loader2 size={16} className="animate-spin" /> : 'Sync Profile'}
+                {updatingProfile ? <Loader2 size={16} className="animate-spin" /> : 'Confirm Synchronization'}
               </button>
             </div>
           </form>
         ) : (
-          <>
-            <div className="w-32 h-32 rounded-full overflow-hidden mx-auto mb-8 bg-blue-500/20 glow-blue group relative">
-              {profile?.photoURL ? <img src={profile.photoURL} className="w-full h-full object-cover" /> : <User size={64} className="m-auto mt-8 opacity-20" />}
-              <button 
-                onClick={() => setIsEditingProfile(true)}
-                className="absolute inset-0 bg-black/60 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center text-white text-[10px] font-black uppercase tracking-widest"
-              >
-                Modify
-              </button>
-            </div>
-            <h2 className="text-4xl font-black italic tracking-tighter mb-2">{profile?.displayName}</h2>
-            <p className="text-[10px] opacity-40 font-black tracking-[0.3em] uppercase mb-8">{profile?.email}</p>
+          <div className="relative z-10 text-center">
+            <motion.div 
+              initial={{ scale: 0.9, opacity: 0 }}
+              animate={{ scale: 1, opacity: 1 }}
+              className="w-40 h-40 rounded-full mx-auto mb-10 relative group"
+            >
+              <div className="absolute inset-0 rounded-full border-2 border-primary/40 animate-spin-slow" />
+              <div className="w-full h-full rounded-full overflow-hidden border-4 border-transparent p-2">
+                <div className="w-full h-full rounded-full overflow-hidden bg-primary/10 glow-blue">
+                  {profile?.photoURL ? (
+                    <img src={profile.photoURL} className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-110" />
+                  ) : (
+                    <User size={64} className="m-auto mt-10 opacity-20" />
+                  )}
+                </div>
+              </div>
+            </motion.div>
             
-            <div className="flex flex-col gap-3">
-              <button onClick={() => setIsEditingProfile(true)} className="py-4 rounded-xl border border-primary/20 text-primary font-black text-xs uppercase tracking-widest hover:bg-primary/5 transition-all">Adjust Identity</button>
-              <button onClick={() => signOut(auth).then(() => setActiveView('home'))} className="py-4 rounded-xl border border-red-500/20 text-red-500 font-black text-xs uppercase tracking-widest hover:bg-red-500/5 transition-all">Disconnect Session</button>
-              {profile && !profile.isAdmin && <button onClick={promoteAdmin} className="text-[8px] opacity-20 hover:opacity-100 transition-opacity">Request Admin Credentials (Demo)</button>}
+            <div className="space-y-2 mb-12">
+              <h2 className="text-6xl font-black italic tracking-tighter uppercase leading-none">{profile?.displayName}</h2>
+              <div className="flex items-center justify-center gap-4">
+                <div className="h-[1px] w-8 bg-primary/40" />
+                <p className="text-[10px] font-black tracking-[0.5em] uppercase italic">{profile?.email}</p>
+                <div className="h-[1px] w-8 bg-primary/40" />
+              </div>
             </div>
-          </>
+            
+            <div className="flex flex-col md:flex-row gap-4 max-w-xl mx-auto">
+              <button onClick={() => setIsEditingProfile(true)} className="flex-1 py-5 rounded-2xl border border-primary/20 text-primary font-black text-[10px] uppercase tracking-[0.2em] hover:bg-primary/5 transition-all italic">Adjust Identity</button>
+              <button onClick={() => signOut(auth).then(() => setActiveView('home'))} className="flex-1 py-5 rounded-2xl border border-red-500/20 text-red-500 font-black text-[10px] uppercase tracking-[0.2em] hover:bg-red-500/5 transition-all italic">Disconnect Session</button>
+            </div>
+            {profile && !profile.isAdmin && (
+              <button onClick={promoteAdmin} className="mt-8 text-[8px] opacity-10 hover:opacity-100 transition-opacity uppercase font-black tracking-[0.4em] italic underline underline-offset-4 decoration-primary/20">Elevate to Architect Credentials</button>
+            )}
+          </div>
         )}
       </div>
 
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-12">
-        <div className="space-y-6">
-          <h3 className="text-2xl font-black uppercase tracking-tighter flex items-center gap-2">
-            <Newspaper size={20} className="text-blue-500" />
-            Reading Progress
-          </h3>
-          <div className="space-y-4">
+      <div className="grid grid-cols-1 lg:grid-cols-2 gap-16">
+        <div className="space-y-8">
+          <div className="flex items-center justify-between border-b border-current opacity-10 pb-4">
+            <h3 className="text-3xl font-black uppercase tracking-tighter italic flex items-center gap-4">
+              <Activity size={24} className="text-primary" />
+              Neural History
+            </h3>
+            <span className="text-[10px] font-black uppercase tracking-widest">Uplink Stable</span>
+          </div>
+          <div className="space-y-6">
             {allProgress.length === 0 ? (
-              <p className="text-[10px] opacity-40 font-bold uppercase tracking-widest">No transmissions processed yet.</p>
+              <div className="p-12 rounded-[2rem] border border-current opacity-5 text-center">
+                 <p className="text-[10px] opacity-70 font-black uppercase tracking-[0.4em] italic">No transmissions processed yet.</p>
+              </div>
             ) : (
               allProgress.map(p => (
-                <div key={p.articleId} className={`p-4 rounded-2xl border transition-all ${isDarkMode ? 'bg-white/5 border-white/5' : 'bg-black/5 border-black/5 shadow-sm'}`}>
-                  <div className="flex justify-between items-start mb-2">
-                    <h4 className="text-xs font-black uppercase tracking-tight line-clamp-1 flex-1 mr-4">{p.articleTitle || 'Unknown Signal'}</h4>
-                    <span className="text-[8px] font-black opacity-40 uppercase">{Math.round(((p.lastLineRead + 1) / p.totalLines) * 100)}%</span>
+                <motion.div 
+                  key={p.articleId}
+                  whileHover={{ x: 10 }}
+                  className={`p-8 rounded-[2.5rem] border transition-all duration-500 group ${isDarkMode ? 'bg-white/[0.02] border-white/5 hover:border-primary/30' : 'bg-white border-black/5 shadow-sm hover:shadow-xl'}`}
+                >
+                  <div className="flex justify-between items-center mb-6">
+                    <h4 className="text-lg font-black uppercase tracking-tighter italic line-clamp-1 flex-1 mr-8 group-hover:text-primary transition-colors">{p.articleTitle || 'Unknown Signal'}</h4>
+                    <div className="flex items-center gap-3">
+                      <span className="text-[10px] font-black italic text-primary">{Math.round(((p.lastLineRead + 1) / p.totalLines) * 100)}%</span>
+                      <div className="w-1.5 h-1.5 rounded-full bg-primary animate-pulse" />
+                    </div>
                   </div>
-                  <div className={`h-1 w-full rounded-full overflow-hidden ${isDarkMode ? 'bg-white/10' : 'bg-black/10'}`}>
-                    <div className="h-full bg-blue-500" style={{ width: `${((p.lastLineRead + 1) / p.totalLines) * 100}%` }} />
+                  <div className={`h-1.5 w-full rounded-full overflow-hidden ${isDarkMode ? 'bg-white/5' : 'bg-black/5'}`}>
+                    <motion.div 
+                      initial={{ width: 0 }}
+                      animate={{ width: `${((p.lastLineRead + 1) / p.totalLines) * 100}%` }}
+                      transition={{ duration: 1, ease: "easeOut" }}
+                      className="h-full bg-primary glow-blue" 
+                    />
                   </div>
-                </div>
+                </motion.div>
               ))
             )}
           </div>
         </div>
 
-        <div className="space-y-6">
-          <h3 className="text-2xl font-black uppercase tracking-tighter flex items-center gap-2">
-            <Settings size={20} className="text-blue-500" />
-            Neural Prefs
-          </h3>
-          <div className="flex flex-wrap gap-2">
-            {CATEGORIES.filter(c => c !== 'All').map(cat => (
-              <button
-                key={cat}
-                onClick={() => handleTogglePreference(cat)}
-                className={`px-4 py-2 rounded-xl text-[10px] font-black uppercase tracking-widest transition-all border ${
-                  preferences?.categories.includes(cat)
-                    ? 'bg-blue-500 border-blue-500 text-white glow-blue shadow-lg'
-                    : isDarkMode 
-                      ? 'bg-white/5 border-white/10 opacity-50' 
-                      : 'bg-black/5 border-black/10 opacity-50'
-                }`}
-              >
-                {cat}
-              </button>
-            ))}
+        <div className="space-y-8">
+           <div className="flex items-center justify-between border-b border-current opacity-10 pb-4">
+            <h3 className="text-3xl font-black uppercase tracking-tighter italic flex items-center gap-4">
+              <Zap size={24} className="text-primary" />
+              Frequency Filter
+            </h3>
+             <span className="text-[10px] font-black uppercase tracking-widest">Active Shields</span>
           </div>
+          <div className="grid grid-cols-2 gap-4">
+            {CATEGORIES.filter(c => c !== 'All').map(cat => {
+              const isActive = preferences?.categories.includes(cat);
+              return (
+                <button
+                  key={cat}
+                  onClick={() => handleTogglePreference(cat)}
+                  className={`p-6 rounded-[2rem] text-[10px] font-black uppercase tracking-[0.2em] transition-all border italic ${
+                    isActive
+                      ? 'bg-primary border-primary text-white glow-blue shadow-xl scale-[1.02]'
+                      : isDarkMode 
+                        ? 'bg-white/5 border-white/5 opacity-40 hover:opacity-100 hover:border-primary/50' 
+                        : 'bg-black/5 border-black/5 opacity-40 hover:opacity-100 hover:border-primary/30'
+                  }`}
+                >
+                  {cat}
+                </button>
+              );
+            })}
+          </div>
+          <p className="text-[10px] opacity-70 font-medium leading-relaxed italic border-l-2 border-primary/20 pl-4">
+            Select frequencies to prioritize signal streams within your neural nexus. Unauthorized channels will be suppressed via automatic filtering protocols.
+          </p>
         </div>
       </div>
     </div>
@@ -1887,7 +2261,7 @@ export default function App() {
     <div className="max-w-4xl mx-auto space-y-12">
       <header className="text-center space-y-4">
         <h2 className="text-6xl font-black italic tracking-tighter uppercase">About BrieflyX.</h2>
-        <p className="text-sm opacity-60 font-black tracking-[0.4em] uppercase">The Future of Information Synthesis</p>
+        <p className="text-sm font-black tracking-[0.4em] uppercase">The Future of Information Synthesis</p>
       </header>
       <div className={`p-8 md:p-12 rounded-[2rem] border ${isDarkMode ? 'bg-card-dark/40 border-white/5' : 'bg-card-light/40 border-black/5'} space-y-6 text-lg leading-relaxed backdrop-blur-xl shadow-2xl`}>
         <p>BrieflyX was born from the necessity of clarity in an era of information overload. We don't just report news; we synthesize the frequencies of the future into digestible neural signals.</p>
@@ -1914,14 +2288,14 @@ export default function App() {
     <div className="max-w-xl mx-auto space-y-12">
       <header className="text-center space-y-4">
         <h2 className="text-6xl font-black italic tracking-tighter uppercase">Contact.</h2>
-        <p className="text-sm opacity-60 font-black tracking-[0.4em] uppercase">Establish neural link</p>
+        <p className="text-sm font-black tracking-[0.4em] uppercase">Establish neural link</p>
       </header>
       <div className={`p-8 rounded-[3rem] border ${isDarkMode ? 'bg-card-dark/40 border-white/5' : 'bg-card-light/40 border-black/5'} backdrop-blur-xl shadow-2xl`}>
         <form className="space-y-6" onSubmit={(e) => { e.preventDefault(); alert("Signal transmitted."); }}>
           <InputField label="Identity Name" placeholder="Futurist-01" isDarkMode={isDarkMode} />
           <InputField label="Neural Email" placeholder="nexus@brieflyx.future" isDarkMode={isDarkMode} />
           <div className="space-y-2">
-            <label className="text-[10px] font-black uppercase tracking-widest opacity-40 ml-4">Transmission Content</label>
+            <label className="text-[10px] font-black uppercase tracking-widest ml-4">Transmission Content</label>
             <textarea 
               className={`w-full px-6 py-4 rounded-2xl outline-none transition-all font-medium h-32 ${isDarkMode ? 'bg-white/5 border-white/10 focus:border-primary text-white' : 'bg-black/5 border-black/10 focus:border-primary text-black'}`}
               placeholder="What frequency are you broadcasting?"
@@ -1946,6 +2320,11 @@ export default function App() {
         
         {/* Noise Texture */}
         <div className="absolute inset-0 opacity-[0.03] pointer-events-none bg-[url('https://grainy-gradients.vercel.app/noise.svg')]" />
+        
+        {/* Scanline Effect */}
+        <div className="scanline fixed top-0 left-0 z-50 opacity-20" />
+        
+        <ExchangeTicker isDarkMode={isDarkMode} />
       </div>
 
       <Navbar 
@@ -1956,6 +2335,8 @@ export default function App() {
         isLoggedIn={isLoggedIn} 
         openAuth={() => setShowAuthModal(true)} 
         isAdmin={profile?.isAdmin || false}
+        searchQuery={searchQuery}
+        setSearchQuery={setSearchQuery}
       />
       <AuthModal isOpen={showAuthModal} onClose={() => setShowAuthModal(false)} isDarkMode={isDarkMode} />
       
@@ -1982,7 +2363,20 @@ export default function App() {
                 dailyStats={dailyStats}
               />
             )}
-            {activeView === 'admin' && profile?.isAdmin && <AdminDashboard articles={articles} isDarkMode={isDarkMode} user={user!} loadingData={loadingData} />}
+            {activeView === 'admin' && (
+              profile?.isAdmin ? (
+                <AdminDashboard articles={articles} isDarkMode={isDarkMode} user={user!} loadingData={loadingData} />
+              ) : (
+                <div className="text-center py-40 space-y-8">
+                  <div className="w-24 h-24 rounded-full bg-red-500/10 flex items-center justify-center text-red-500 mx-auto">
+                    <ShieldAlert size={48} />
+                  </div>
+                  <h2 className="text-4xl font-black uppercase italic italic tracking-tighter">Access Denied.</h2>
+                  <p className="opacity-40 max-w-md mx-auto">Your neural signature does not possess the required clearance level for this sector.</p>
+                  <button onClick={() => setActiveView('home')} className="px-10 py-4 rounded-2xl border border-current opacity-20 hover:opacity-100 transition-all text-xs font-black uppercase tracking-widest">Return to Nexus</button>
+                </div>
+              )
+            )}
             {activeView === 'profile' && renderProfile()}
             {activeView === 'about' && renderAbout()}
             {activeView === 'contact' && renderContact()}
